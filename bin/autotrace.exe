@@ -1,0 +1,252 @@
+/**
+ * ============================================================================
+ * TOONYUG ENTERPRISE CENTERLINE VECTOR TRACER PRO
+ * ============================================================================
+ * Architecture: Offscreen Canvas Filter + AutoTrace CLI (--centerline) + JSFL
+ * Output: 100% Pure Single-Line Vector Strokes (Zero Hollow Double-Lines)
+ * ============================================================================
+ */
+
+(function (global) {
+    'use strict';
+
+    const _req = (typeof require !== 'undefined') ? require : (window.require || (window.cep_node && window.cep_node.require));
+    const fs = _req ? _req('fs') : null;
+    const path = _req ? _req('path') : null;
+    const os = _req ? _req('os') : null;
+    const cp = _req ? _req('child_process') : null;
+
+    /**
+     * 1. Get AutoTrace Binary Path
+     */
+    function getAutoTraceBinaryPath() {
+        if (!window.__adobe_cep__) throw new Error("Adobe CEP runtime not detected.");
+
+        let extRoot = window.__adobe_cep__.getSystemPath("extension") || "";
+        extRoot = decodeURIComponent(extRoot);
+        extRoot = extRoot.replace(/^file:[\/\\]+/i, '');
+        extRoot = extRoot.replace(/^([a-zA-Z])\|/i, '$1:');
+
+        const isWin = (os ? os.platform() === 'win32' : navigator.platform.indexOf('Win') !== -1);
+        const binName = isWin ? 'autotrace.exe' : 'autotrace';
+
+        let binPath = path ? path.join(extRoot, 'bin', binName) : (extRoot + '/bin/' + binName);
+        if (isWin) binPath = binPath.replace(/\//g, '\\');
+
+        if (fs && !fs.existsSync(binPath)) {
+            throw new Error("autotrace.exe missing! Please place it inside: " + binPath);
+        }
+        return binPath;
+    }
+
+    /**
+     * 2. ⭐ SMART PRE-PROCESSOR (Pencil Shading & Gray Noise Filter) ⭐
+     * Converts raw pencil graphite sketches into high-contrast pure B&W lines
+     */
+    function preprocessSketchToBinary(inputImagePath, thresholdValue) {
+        return new Promise((resolve, reject) => {
+            try {
+                const img = new Image();
+                img.onload = function () {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+
+                    // Draw image
+                    ctx.drawImage(img, 0, 0);
+                    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const data = imgData.data;
+
+                    const thresh = thresholdValue || 140; // Optimal graphite separation
+
+                    for (let i = 0; i < data.length; i += 4) {
+                        // Luminance Grayscale formula
+                        const brightness = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+
+                        // Binary Threshold: Pure White background, Pure Black stroke
+                        const finalColor = (brightness < thresh) ? 0 : 255;
+                        data[i]     = finalColor;
+                        data[i + 1] = finalColor;
+                        data[i + 2] = finalColor;
+                        data[i + 3] = 255; // Solid Alpha
+                    }
+
+                    ctx.putImageData(imgData, 0, 0);
+
+                    // Export clean preprocessed PNG
+                    const base64Data = canvas.toDataURL('image/png').replace(/^data:image\/png;base64,/, '');
+                    const cleanPngPath = path.join(os.tmpdir(), `ty_clean_sketch_${Date.now()}.png`);
+                    fs.writeFileSync(cleanPngPath, Buffer.from(base64Data, 'base64'));
+
+                    resolve(cleanPngPath);
+                };
+                img.onerror = () => reject(new Error("Unable to load stage image for pre-processing."));
+                img.src = 'file:///' + inputImagePath.replace(/\\/g, '/');
+
+            } catch (err) {
+                reject(err);
+            }
+        });
+    }
+
+    /**
+     * 3. ⭐ EXECUTE AUTOTRACE CENTERLINE CLI ⭐
+     */
+    function executeCenterlineAutoTrace(cleanPngPath, strokeThickness) {
+        return new Promise((resolve, reject) => {
+            try {
+                const autoTraceBin = getAutoTraceBinaryPath();
+                const outputSvgPath = path.join(os.tmpdir(), `ty_centerline_${Date.now()}.svg`);
+
+                // Professional Centerline Optimization Flags
+                const args = [
+                    '--centerline',
+                    '--color-count', '2',
+                    '--filter-iterations', '4',        // Cleans residual paper specks
+                    '--error-threshold', '2.0',         // Smooth bezier curve fitting
+                    '--line-threshold', '1.0',
+                    '--remove-adjacent-corners',
+                    '--output-file', outputSvgPath,
+                    '--output-format', 'svg',
+                    cleanPngPath
+                ];
+
+                const binDir = path.dirname(autoTraceBin);
+                const proc = cp.spawn(autoTraceBin, args, { cwd: binDir });
+
+                proc.on('close', (code) => {
+                    if (fs.existsSync(cleanPngPath)) {
+                        try { fs.unlinkSync(cleanPngPath); } catch (e) {}
+                    }
+
+                    if (code === 0 && fs.existsSync(outputSvgPath)) {
+                        // Fix SVG Stroke Width to match user line thickness
+                        let svgContent = fs.readFileSync(outputSvgPath, 'utf8');
+                        const targetWidth = strokeThickness || 1.0;
+                        svgContent = svgContent.replace(/stroke-width="[^"]*"/g, `stroke-width="${targetWidth}"`);
+                        svgContent = svgContent.replace(/stroke="none"/g, 'stroke="#000000"');
+                        fs.writeFileSync(outputSvgPath, svgContent, 'utf8');
+
+                        resolve(outputSvgPath);
+                    } else {
+                        reject(new Error(`AutoTrace execution failed with code ${code}.`));
+                    }
+                });
+
+                proc.on('error', (err) => {
+                    reject(new Error(`AutoTrace binary execution error: ${err.message}`));
+                });
+
+            } catch (err) {
+                reject(err);
+            }
+        });
+    }
+
+    /**
+     * 4. JSFL Bridge: Export Selected Bitmap & Import Clean SVG onto Stage
+     */
+    function executeAnimateTracingBridge(strokeThickness) {
+        return new Promise((resolve, reject) => {
+            const jsflExport = `
+            (function() {
+                var doc = fl.getDocumentDOM();
+                if (!doc) return JSON.stringify({ error: "NO_DOC" });
+
+                var sel = doc.selection;
+                if (!sel || sel.length === 0) return JSON.stringify({ error: "NO_SELECTION" });
+
+                var el = sel[0];
+                if (el.elementType !== "instance" || el.instanceType !== "bitmap") {
+                    return JSON.stringify({ error: "NOT_BITMAP" });
+                }
+
+                // Temp PNG path
+                var tempPng = fl.configURI + "ToonYug_Temp_Stage_Bitmap.png";
+                var nativePath = FLfile.uriToPlatformPath(tempPng);
+
+                // Export selected bitmap
+                var item = el.libraryItem;
+                if (!item) return JSON.stringify({ error: "NO_LIBRARY_ITEM" });
+
+                item.exportToFile(tempPng);
+
+                return JSON.stringify({
+                    success: true,
+                    path: nativePath,
+                    uri: tempPng,
+                    x: el.left,
+                    y: el.top,
+                    width: el.width,
+                    height: el.height
+                });
+            })();`;
+
+            window.__adobe_cep__.evalScript(jsflExport, async (res) => {
+                try {
+                    const info = JSON.parse(res);
+                    if (!info.success) {
+                        if (info.error === "NOT_BITMAP") {
+                            return reject(new Error("Please select an imported bitmap sketch (PNG/JPG) on stage."));
+                        }
+                        return reject(new Error("Selection invalid. Please select the character sketch."));
+                    }
+
+                    // Pre-process & Centerline trace
+                    const cleanPng = await preprocessSketchToBinary(info.path, 145);
+                    const finalSvgPath = await executeCenterlineAutoTrace(cleanPng, strokeThickness);
+
+                    // Import back to Animate Stage as Pure Vector Strokes
+                    const svgPlatformURI = "file:///" + finalSvgPath.replace(/\\/g, '/');
+                    const jsflImport = `
+                    (function() {
+                        var doc = fl.getDocumentDOM();
+                        var tl = doc.getTimeline();
+
+                        // Create dedicated INKS layer
+                        var inksLayerIdx = tl.addNewLayer("[CHARACTER_SINGLE_INKS]", "normal", true);
+                        
+                        // Import clean centerline SVG
+                        doc.importFile("${svgPlatformURI}", true);
+
+                        // Align to original sketch bounds
+                        if (doc.selection && doc.selection.length > 0) {
+                            var inkObj = doc.selection[0];
+                            inkObj.left = ${info.x};
+                            inkObj.top = ${info.y};
+                            inkObj.width = ${info.width};
+                            inkObj.height = ${info.height};
+
+                            // Group into clean Drawing Object (J)
+                            try { doc.union(); } catch(e) { doc.group(); }
+                        }
+
+                        // Clean temp exported image
+                        FLfile.remove("${info.uri}");
+                        return "SUCCESS";
+                    })();`;
+
+                    window.__adobe_cep__.evalScript(jsflImport, (importRes) => {
+                        // Cleanup temp SVG
+                        if (fs.existsSync(finalSvgPath)) {
+                            try { fs.unlinkSync(finalSvgPath); } catch (e) {}
+                        }
+                        resolve("Vector Centerline Inking Generated Successfully!");
+                    });
+
+                } catch (err) {
+                    reject(err);
+                }
+            });
+        });
+    }
+
+    // Public API
+    global.TY_TRACER = {
+        traceSelectedSketch: function (strokeWidth) {
+            return executeAnimateTracingBridge(strokeWidth || 1.2);
+        }
+    };
+
+})(typeof window !== 'undefined' ? window : this);

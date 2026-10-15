@@ -1,0 +1,25 @@
+# Ignore server deployment packages and PHP files
+server_deployment_package/
+admin/
+unzip.php
+
+# Ignore staging build folder & installer executables
+.staging_extension/
+*.exe
+
+# Ignore heavy backup archives
+*.zip
+*.rar
+*.7z
+
+# Ignore build output and temp logs
+*.log
+debug.log
+.debug
+scratch/
+installer_output/
+
+# OS metadata
+Thumbs.db
+Desktop.ini
+.DS_Store

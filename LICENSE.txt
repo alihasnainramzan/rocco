@@ -1,0 +1,47 @@
+================================================================================
+ROCCO MASTER PANEL & STUDIO TOOLKITS - SOFTWARE LICENSE AGREEMENT & EULA
+================================================================================
+Product: Rocco Master Panel / Rocco Studio Toolkits
+Version: 1.0.2 Pro
+Publisher & Developer: RacEducater Official
+Support: help@expeazzy.com | WhatsApp: +92 346 4056113
+Website: https://rocco.expeazzy.com/
+Copyright (c) 2024-2026 RacEducater. All Rights Reserved.
+
+--------------------------------------------------------------------------------
+1. INTELLECTUAL PROPERTY & COPYRIGHT PROTECTION
+--------------------------------------------------------------------------------
+This software, including its source code, scripts (.jsfl, .js, .jsx), user interface,
+icons, architecture, and documentation, is the proprietary property of RacEducater.
+It is protected by international copyright treaties, the Digital Millennium Copyright
+Act (DMCA, 17 U.S.C. Section 512 et seq.), and intellectual property laws worldwide.
+
+This product is an independently developed, standalone tool engineered with proprietary
+code. It is NOT an unauthorized clone, duplicate, or derivative work of any third-party
+commercial software.
+
+--------------------------------------------------------------------------------
+2. GRANT OF LICENSE
+--------------------------------------------------------------------------------
+RacEducater grants you a personal, non-exclusive, revocable, non-transferable license
+to install and use Rocco Master Panel strictly in accordance with your registered
+account tier and active license validation.
+
+--------------------------------------------------------------------------------
+3. RESTRICTIONS
+--------------------------------------------------------------------------------
+No Any restrictions you easily customized this 
+what ever you want but not remove RacEducater copyright ©️ keep in mind 
+
+--------------------------------------------------------------------------------
+4. DMCA COMPLIANCE & LEGAL NOTICES
+--------------------------------------------------------------------------------
+Any unauthorized reproduction, distribution, public display, or commercial exploitation
+of this software or its constituent scripts without written permission from RacEducater
+constitutes copyright infringement and will be subject to DMCA takedown notices,
+statutory damages, and legal remedies under applicable international law.
+
+For licensing inquiries, business partnerships, or copyright notices:
+Email: help@expeazzy.com
+Official Channel: https://www.youtube.com/@Raceducaterofficial
+================================================================================

@@ -1,0 +1,452 @@
+/* ==========================================================================
+   Rocco by Raceducater - Professional Adobe Native UI (widgets.css)
+   ========================================================================== */
+
+#app-root {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-stack);
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* Header */
+.rocco-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background-color: rgba(0, 0, 0, 0.28);
+    border-bottom: 1px solid var(--color-card-border);
+}
+
+.rocco-brand {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.rocco-logo-img {
+    height: 22px;
+    width: auto;
+    object-fit: contain;
+    border-radius: 2px;
+}
+
+.rocco-brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+
+.rocco-title {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    color: #ffffff;
+    text-transform: uppercase;
+}
+
+.rocco-subtitle {
+    font-size: 9px;
+    font-weight: 500;
+    color: #38bdf8;
+    letter-spacing: 0.2px;
+}
+
+.rocco-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-icon-reload {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    padding: 5px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-fast);
+}
+
+.btn-icon-reload:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+    border-color: var(--color-card-border);
+}
+
+/* Scroll Area */
+.rocco-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Compact Widget Card */
+.rocco-card {
+    background-color: var(--color-card);
+    border: 1px solid var(--color-card-border);
+    border-radius: var(--radius-md);
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.card-title-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.card-title {
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-text-secondary);
+}
+
+/* Status Strip */
+.rocco-status-strip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 9px;
+    background-color: rgba(0, 0, 0, 0.22);
+    border: 1px solid var(--color-card-border);
+    border-radius: var(--radius-sm);
+}
+
+.status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: #555555;
+    flex-shrink: 0;
+}
+
+.rocco-status-strip.active .status-dot {
+    background-color: var(--color-accent-green);
+    box-shadow: 0 0 5px var(--color-accent-green);
+}
+
+.status-text-wrap {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.status-main {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.status-sub {
+    font-size: 9.5px;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Button System */
+.btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    outline: none;
+}
+
+.btn:active {
+    transform: translateY(1px);
+}
+
+.btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.btn-primary {
+    background-color: var(--color-accent-blue);
+    color: #ffffff;
+}
+
+.btn-primary:hover {
+    background-color: var(--color-accent-blue-hover);
+}
+
+.btn-secondary {
+    background-color: var(--color-btn-default);
+    color: var(--color-text);
+    border-color: var(--color-card-border);
+}
+
+.btn-secondary:hover {
+    background-color: var(--color-btn-default-hover);
+}
+
+.btn-accent {
+    background-color: var(--color-accent-green);
+    color: #ffffff;
+}
+
+.btn-accent:hover {
+    background-color: var(--color-accent-green-hover);
+}
+
+.btn-tiny {
+    font-size: 9.5px;
+    padding: 3px 7px;
+    background: var(--color-btn-default);
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-card-border);
+}
+
+.btn-tiny:hover:not(:disabled) {
+    background: var(--color-btn-default-hover);
+    color: var(--color-text);
+}
+
+.button-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.button-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    justify-content: flex-end;
+}
+
+/* Form Controls & Checkbox Stack */
+.form-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 4px 0 2px 0;
+}
+
+.form-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+}
+
+.form-select {
+    flex: 1;
+    background-color: var(--color-input-bg);
+    color: var(--color-text);
+    border: 1px solid var(--color-input-border);
+    font-size: 10px;
+    padding: 3px 6px;
+    border-radius: var(--radius-sm);
+    outline: none;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.form-select:focus {
+    border-color: var(--color-accent-blue);
+}
+
+.checkbox-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 3px 0 5px 0;
+}
+
+.checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 2px 0;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+    accent-color: var(--color-accent-blue);
+    width: 13px;
+    height: 13px;
+}
+
+/* Mapping Table Widget */
+.mapping-widget {
+    background-color: var(--color-card);
+    border: 1px solid var(--color-card-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.mapping-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    background-color: rgba(0, 0, 0, 0.18);
+    border-bottom: 1px solid var(--color-card-border);
+}
+
+.mapping-body {
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.mapping-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
+    padding: 4px 6px;
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-card-border);
+}
+
+.src-tag {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--color-text);
+    width: 40%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.arrow-icon {
+    font-size: 10px;
+    color: var(--color-text-secondary);
+    flex-shrink: 0;
+}
+
+.tgt-dropdown {
+    width: 48%;
+    background-color: var(--color-input-bg);
+    color: var(--color-text);
+    border: 1px solid var(--color-input-border);
+    font-size: 10px;
+    padding: 3px 5px;
+    border-radius: var(--radius-sm);
+    outline: none;
+}
+
+.tgt-dropdown:focus {
+    border-color: var(--color-accent-blue);
+}
+
+.match-tag {
+    font-size: 8.5px;
+    padding: 1px 4px;
+    border-radius: 2px;
+    font-weight: 600;
+}
+
+.match-high {
+    background: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+}
+
+.match-med {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+}
+
+.match-low {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+}
+
+.empty-notice {
+    font-size: 10px;
+    color: var(--color-text-secondary);
+    text-align: center;
+    padding: 12px 0;
+}
+
+/* Expressions Grid */
+.expr-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+}
+
+.btn-expr-tile {
+    background-color: var(--color-btn-default);
+    border: 1px solid var(--color-card-border);
+    border-radius: var(--radius-sm);
+    padding: 6px 3px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    color: var(--color-text);
+}
+
+.btn-expr-tile:hover {
+    background-color: var(--color-btn-default-hover);
+    border-color: var(--color-accent-blue);
+}
+
+.tile-icon { font-size: 14px; }
+.tile-name { font-size: 9px; font-weight: 500; color: var(--color-text-secondary); }
+
+/* Console */
+.rocco-console {
+    background-color: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--color-card-border);
+    border-radius: var(--radius-sm);
+    padding: 7px;
+    height: 95px;
+    overflow-y: auto;
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    line-height: 1.4;
+}
+
+.log-entry { margin-bottom: 2px; word-break: break-all; }
+.log-entry.info { color: #38bdf8; }
+.log-entry.success { color: #34d399; }
+.log-entry.warn { color: #fbbf24; }
+.log-entry.error { color: #f87171; }

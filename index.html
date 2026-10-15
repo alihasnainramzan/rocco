@@ -1,0 +1,2110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <script>
+        (function() {
+            try {
+
+                var lastTab = localStorage.getItem('toonyug_last_active_tab');
+                // No auto redirect
+            } catch(e) {}
+        })();
+    </script>
+
+    <title>Rocco by Raceducater - Studio Toolkits</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="js/ty_lipsync_engine.js"></script>
+    <script src="js/ty_lipsync_controller.js"></script>
+    <script src="js/ty_tracer_engine.js"></script>
+    <script src="js/ty_gap_healer.js"></script>
+    <script src="js/libs/CSInterface.js"></script>
+    <script src="js/ty_shortcuts.js"></script>
+<style>
+
+.ty-dual-cards-row {
+    display: flex !important;
+    gap: 8px !important;
+    width: 100% !important;
+    margin-bottom: 10px !important;
+}
+
+.ty-card-tile {
+    flex: 1 1 0 !important;
+    width: auto !important;
+    min-width: 0 !important;
+}
+
+
+.card-gold-trial.trial-blocked {
+    opacity: 0.45 !important;
+    filter: grayscale(0.85) !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+    border-color: #475569 !important;
+    box-shadow: none !important;
+}
+
+.card-gold-trial.trial-blocked .tile-sub {
+    color: #ef4444 !important;
+    font-weight: 700 !important;
+}
+</style>
+    <script src="js/rocco_license.js"></script>
+    <script src="js/rocco_license_engine.js" defer></script>
+    <script src="js/rocco_engine.js" defer></script>
+    <script src="js/rocco_auth_modal.js" defer></script>
+</head>
+<body>
+
+<!-- ================= 🔐 MASTER LOCK OVERLAY ================= -->
+<div id="securityLockOverlay" class="lock-overlay" style="display: none !important; pointer-events: none !important; visibility: hidden !important;">
+
+    <!-- ================= 🔑 1:1 CIRCULAR LICENSE VERIFYING LOADER ================= -->
+<div id="verifyingBadge" class="ty-verifying-loader-card">
+    <div class="ty-spinner-outer-wrap">
+        <!-- 1. Faint Outer Track Ring -->
+        <div class="ty-ring-track"></div>
+        
+        <!-- 2. Main Glowing Rotating Arc -->
+        <div class="ty-ring-spinner"></div>
+        
+        <!-- 3. Soft Radial Glow behind Key -->
+        <div class="ty-ring-pulse-glow"></div>
+        
+        <!-- 4. Center Key Icon -->
+        <div class="ty-key-center-box">
+            <img src="images/veification-loading-key-icon.png" 
+                 onerror="this.onerror=null; this.src='veification-loading-key-icon.png';" 
+                 alt="Verifying Key" 
+                 class="ty-key-loading-img">
+        </div>
+    </div>
+
+    <!-- Animated Verification Text -->
+    <div class="ty-loader-text-group">
+        <h3 class="ty-loader-title">
+            Verifying License Key<span class="ty-dots-pulse"><span>.</span><span>.</span><span>.</span></span>
+        </h3>
+        <p class="ty-loader-subtitle">Please wait while we verify your license.</p>
+    </div>
+</div>
+
+    <!-- 2. 🔐 CYBER-GLOSSY MASTER ACTIVATION CARD -->
+    <div id="lockCardBox" class="ty-glass-lock-card" style="display: none;">
+        <div class="corner-glow glow-top-left"></div>
+        <div class="corner-glow glow-top-right"></div>
+
+        <!-- HEADER -->
+        <div class="ty-lock-header-row">
+            <div class="ty-lock-icon-box">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#00d2ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+            </div>
+            <div class="ty-lock-header-text">
+                <h2 class="ty-lock-title">License Key Verification</h2>
+                <p class="ty-lock-subtitle">Unlock the full power of Rocco by Raceducater</p>
+            </div>
+        </div>
+
+        <!-- INPUT FIELD -->
+        <div class="ty-key-input-box">
+            <svg class="input-icon-key" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 2l-2 2m-1.5 1.5L14 9m-1.5 1.5l-2 2m-2-2l-2 2 2 2-2 2 2 2-3 3H3v-3l8.5-8.5"></path>
+                <circle cx="16.5" cy="7.5" r="3.5"></circle>
+            </svg>
+            <input type="text" id="securityKeyInput" placeholder="Enter Your License Key (e.g. TY1M-XXXX-XXXX-XXXX)" autocomplete="off" onkeydown="if(event.key==='Enter') executeLicenseUnlock();">
+            <button type="button" class="btn-paste-clipboard" onclick="pasteFromClipboard()" title="Paste from Clipboard">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- PRIMARY VERIFY BUTTON -->
+        <button type="button" id="btnUnlockPanel" class="btn-verify-primary" onclick="executeLicenseUnlock();">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                <polyline points="9 12 11 14 15 10"></polyline>
+            </svg>
+            <span>Verify Key &nbsp;→</span>
+        </button>
+
+        <!-- FEEDBACK MESSAGE -->
+        <div id="lockErrorMsg" class="ty-lock-feedback"></div>
+
+        <!-- DUAL CARDS (TRIAL & BUY) -->
+        <div class="ty-dual-cards-row">
+            <!-- TRIAL BUTTON: CLICK PAR POPUP KHOLEGA -->
+            <div class="ty-card-tile card-gold-trial" id="btnStartTrial" onclick="openTrialAuthModal()">
+                <div class="tile-icon-wrap icon-gold">👑</div>
+                <div class="tile-text-wrap">
+                    <b class="tile-title">14 Days Free Trial</b>
+                    <span class="tile-sub">Explore All Features</span>
+                </div>
+            </div>
+
+            <div class="ty-card-tile card-cyan-buy" onclick="openExternalLink('https://raceducater.com/')">
+                <div class="tile-icon-wrap icon-cyan">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
+                        <circle cx="9" cy="21" r="1.5"></circle>
+                        <circle cx="20" cy="21" r="1.5"></circle>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                    </svg>
+                </div>
+                <div class="tile-text-wrap">
+                    <b class="tile-title">Don’t have a key?</b>
+                    <span class="tile-sub text-cyan-highlight">Get Your License</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- OR DIVIDER -->
+        <div class="ty-or-divider">
+            <span>OR</span>
+        </div>
+
+        <!-- TRIAD CARDS -->
+        <div class="ty-triad-cards-row">
+            <div class="ty-mini-card" onclick="restorePreviousSession()">
+                <div class="mini-card-icon">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M23 4v6h-6"></path>
+                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                    </svg>
+                </div>
+                <b class="mini-card-title">Restore</b>
+                <span class="mini-card-sub">Re-activate PC</span>
+            </div>
+
+            <div class="ty-mini-card" onclick="openExternalLink('https://raceducater.com/account/')">
+                <div class="mini-card-icon">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="8" y1="6" x2="21" y2="6"></line>
+                        <line x1="8" y1="12" x2="21" y2="12"></line>
+                        <line x1="8" y1="18" x2="21" y2="18"></line>
+                        <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                        <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                        <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                    </svg>
+                </div>
+                <b class="mini-card-title">Status</b>
+                <span class="mini-card-sub">View Details</span>
+            </div>
+
+            <div class="ty-mini-card" onclick="openExternalLink('https://raceducater.com/support/')">
+                <div class="mini-card-icon">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                </div>
+                <b class="mini-card-title">Help</b>
+                <span class="mini-card-sub">Key Guide</span>
+            </div>
+        </div>
+
+        <!-- CONTACT SUPPORT BAR -->
+        <div class="ty-support-bar" onclick="openWhatsApp()">
+            <div class="support-bar-left">
+                <div class="support-bar-headset">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
+                        <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
+                    </svg>
+                </div>
+                <div class="support-bar-info">
+                    <b class="support-bar-title">Contact Support</b>
+                    <span class="support-bar-sub">Get help from Raceducater Team</span>
+                </div>
+            </div>
+            <span class="support-bar-chevron">›</span>
+        </div>
+
+    </div> <!-- lockCardBox end -->
+</div> <!-- securityLockOverlay end -->
+
+<!-- ================= CLEAN PROFESSIONAL HEADER & UPDATE NOTIFICATION TOAST ================= -->
+<div id="topUpdateToast" class="top-update-toast" style="display: none !important;">
+    <div class="toast-update-icon">
+        <div class="toast-rocket-circle">🚀</div>
+    </div>
+    <div class="toast-update-info">
+        <div class="toast-update-title">
+            <span>NEW UPDATE AVAILABLE</span>
+            <span id="updateVerBadge" class="toast-ver-pill">v2.1.0</span>
+        </div>
+        <div id="updateDescText" class="toast-update-msg">New Rigging Engine &amp; Speed Fixes!</div>
+    </div>
+    <div class="toast-update-actions">
+        <button type="button" class="btn-toast-update" onclick="downloadUpdateClick()">⚡ Update</button>
+        <button type="button" class="btn-toast-later" onclick="snoozeUpdateNotification()" title="Remind tomorrow">Later</button>
+    </div>
+</div>
+
+<div class="panel-header-pro">
+    <!-- LEFT: SIRF AAPKA ASLI PNG LOGO (NO EXTRA TEXT) -->
+    <div class="pro-header-left">
+    <div class="logo-wrapper">
+        <img src="images/Rocco Master Logo.png" class="pro-logo-banner" alt="Rocco by Raceducater">
+    </div>
+</div>
+
+    <!-- RIGHT: LIVE TIER PILL BADGE & CUSTOMER DP -->
+    <div class="pro-header-right">
+        <!-- TIER & LIVE DEVICE PILL BADGE -->
+        <div class="pro-license-badge">
+            <div class="badge-crown-icon">👑</div>
+            <div class="badge-info-col">
+                <div class="badge-tier-title">
+                    <span id="hdrPlanTitle">Studio Master</span>
+                    <span class="pulse-status-dot"></span>
+                </div>
+                <div class="badge-devices-text" id="hdrDeviceText">Dev Mode • All Tools Active</div>
+            </div>
+        </div>
+
+        <!-- CUSTOMER DP / AVATAR -->
+        <div class="user-avatar-wrap" onclick="openAccountFromHeader(event)" title="Account & Settings">
+            <img id="userAvatarImg" src="images/My Account Icon.webp">
+        </div>
+    </div>
+</div>
+
+   <!-- 7-DAYS EXPIRY WARNING BANNER -->
+    <div id="expiryWarningBanner" class="expiry-alert-box" style="display: none !important;">
+        <div class="alert-content">
+            <span>⚠️</span>
+            <span id="alertDaysText">Plan expires in 7 days!</span>
+        </div>
+        <button class="btn-renew-fast" onclick="openExternalLink('https://raceducater.com/')">⚡ Renew Now</button>
+        <span class="alert-close" onclick="closeWarningBanner()">✕</span>
+    </div>
+
+
+    <!-- ================= PRO SEARCH BAR (CTRL + K) ================= -->
+    <div class="search-container-pro" onclick="document.getElementById('searchInput').focus()">
+        <!-- Search SVG Icon (Crystal Sharp) -->
+        <svg class="search-svg-icon" width="16" height="16" style="width:16px;height:16px;min-width:16px;min-height:16px;max-width:16px;max-height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+
+        <!-- Input Box -->
+        <input type="text" id="searchInput" onkeyup="filterTools()" placeholder="Search tools..." autocomplete="off">
+
+        <!-- Keyboard Shortcut Pill -->
+        <div class="search-shortcut-pill">Ctrl + K</div>
+    </div>
+
+<!-- ================= 🏷️ STUDIO TOOLKITS CATEGORY FILTER ROW ================= -->
+<div class="toolkit-cat-bar-wrap">
+    <div class="toolkit-cat-scroll" id="toolkitCatScroll">
+        <button type="button" class="tool-cat-pill active" onclick="filterStudioToolkit('all', this)">All</button>
+        <button type="button" class="tool-cat-pill" onclick="filterStudioToolkit('fav', this)">⭐ Pinned</button>
+	<button type="button" class="tool-cat-pill" onclick="filterStudioToolkit('buttons', this)">
+    Buttons
+</button>
+        <button type="button" class="tool-cat-pill" onclick="filterStudioToolkit('locomotion', this)">Locomotion</button>
+        <button type="button" class="tool-cat-pill" onclick="filterStudioToolkit('rigging', this)">Rigging</button>
+        <button type="button" class="tool-cat-pill" onclick="filterStudioToolkit('timeline', this)">Timeline</button>
+        <button type="button" class="tool-cat-pill" onclick="filterStudioToolkit('tweens', this)">Tweens</button>
+        <button type="button" class="tool-cat-pill" onclick="filterStudioToolkit('align', this)">Alignments</button>
+    </div>
+
+
+    <!-- 3-Dots More Menu Button & Dropdown -->
+    <div class="tool-cat-more-box" id="toolCatMoreBox">
+        <button type="button" class="tool-cat-more-btn" id="btnToolCatMore" onclick="toggleCatMoreDropdown(event)" title="More Categories">
+            •••
+        </button>
+
+        <!-- Dropdown Popup Menu -->
+        <div class="tool-cat-dropdown-menu" id="toolCatDropdownMenu">
+            <div class="cat-drop-item" onclick="selectDropdownCategory('camera', 'Camera & FX', this)">🎥 Camera &amp; FX</div>
+            <div class="cat-drop-item" onclick="selectDropdownCategory('inbetween', 'In-Betweens', this)">✂️ In-Betweens</div>
+            <div class="cat-drop-item" onclick="selectDropdownCategory('timecode', 'Sync & Loops', this)">⏳ Sync &amp; Loops</div>
+            <div class="cat-drop-item" onclick="selectDropdownCategory('pro', 'Pro Tools Only 👑', this)">👑 Pro Master Tools</div>
+        </div>
+    </div>
+</div>
+
+
+<!-- 🎛️ BUTTONS MAIN VIEW (सिर्फ एक बार रहेगा) -->
+<div id="buttonsMainView" class="buttons-main-view" style="display: none;">
+    <div id="allToolsButtonsGrid" class="tools-icon-grid"></div>
+
+    <div class="layer-dock-wrapper">
+        <div class="layer-dock-header">
+            <span class="layer-dock-title">Layer Control Buttons</span>
+        </div>
+
+        <div class="layer-action-toolbar" id="layerActionToolbar">
+            <!-- 1. SELECT UP -->
+            <button type="button" class="layer-quick-btn" onclick="tySelectUp()" title="Select Layer Above (Alt + ↑)">
+                <div class="layer-icon-circle">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <polyline points="18 15 12 9 6 15"></polyline>
+                    </svg>
+                </div>
+                <span class="layer-btn-label">Select Up</span>
+            </button>
+
+            <!-- 2. SELECT DOWN -->
+            <button type="button" class="layer-quick-btn" onclick="tySelectDown()" title="Select Layer Below (Alt + ↓)">
+                <div class="layer-icon-circle">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+                <span class="layer-btn-label">Select Down</span>
+            </button>
+
+            <!-- 3. SHIFT UP -->
+            <button type="button" class="layer-quick-btn" onclick="tyMoveUp()" title="Move Layer Upward (Ctrl + Alt + ↑)">
+                <div class="layer-icon-circle">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <polyline points="17 11 12 6 7 11"></polyline>
+                        <polyline points="17 18 12 13 7 18"></polyline>
+                    </svg>
+                </div>
+                <span class="layer-btn-label">Shift Up</span>
+            </button>
+
+            <!-- 4. SHIFT DOWN -->
+            <button type="button" class="layer-quick-btn" onclick="tyMoveDown()" title="Move Layer Downward (Ctrl + Alt + ↓)">
+                <div class="layer-icon-circle">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <polyline points="7 13 12 18 17 13"></polyline>
+                        <polyline points="7 6 12 11 17 6"></polyline>
+                    </svg>
+                </div>
+                <span class="layer-btn-label">Shift Down</span>
+            </button>
+
+            <!-- 5. FOCUS LOCK -->
+            <button type="button" class="layer-quick-btn" onclick="tyFocusLock()" title="Focus Mode: Lock All Other Layers">
+                <div class="layer-icon-circle">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                </div>
+                <span class="layer-btn-label">Focus Lock</span>
+            </button>
+
+            <!-- 6. SOLO VIEW -->
+            <button type="button" class="layer-quick-btn" onclick="tySoloView()" title="Solo View: Hide All Other Layers">
+                <div class="layer-icon-circle">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                </div>
+                <span class="layer-btn-label">Solo View</span>
+            </button>
+
+	   <button type="button" class="layer-quick-btn" onclick="runTYCmd('TY Layer and Symbol Renamer')" title="Smart Layer &amp; Symbol Renamer">
+                <div class="layer-icon-circle">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                </div>
+                <span class="layer-btn-label">Renamer</span>
+            </button>
+
+            <!-- 7. PURGE EMPTY -->
+            <button type="button" class="layer-quick-btn" onclick="tyPurgeEmpty()" title="Purge Unused Empty Layers from Timeline">
+                <div class="layer-icon-circle">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                </div>
+                <span class="layer-btn-label">Purge Empty</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+
+    <!-- ================= 🚀 INDUSTRY-GRADE PANEL CONTENT ================= -->
+    <div class="panel-content" id="panelContentArea">
+
+        <!-- ⭐ DYNAMIC FAVORITES CATEGORY (STAR CLICK PAR APNE AAP UPAR AAYEGA) -->
+        <details id="catFavoritesBlock" class="category-block cat-theme-accent" style="display: none;" open>
+            <summary class="cat-header">
+                <div class="cat-header-left">
+                    <div class="cat-badge-icon icon-fav-gold">⭐</div>
+                    <div class="cat-title-wrap">
+                        <span class="cat-main-title">FAVORITES &amp; PINNED</span>
+                        <span class="cat-sub-title">Your quick-access essential toolkits</span>
+                    </div>
+                </div>
+                <div class="cat-header-right">
+                    <span class="cat-count-pill" id="favCountPill">0 Tools</span>
+                    <span class="accordion-arrow">▼</span>
+                </div>
+            </summary>
+            <div class="tool-list" id="favToolsContainer"></div>
+        </details>
+
+	
+
+        <!-- 1. ONE CLICK SUPER TOOLS -->
+        <details class="category-block cat-theme-super" open>
+            <summary class="cat-header">
+                <div class="cat-header-left">
+                    <div class="cat-badge-icon icon-super">⚡</div>
+                    <div class="cat-title-wrap">
+                        <span class="cat-main-title">ONE CLICK SUPER TOOLS</span>
+                        <span class="cat-sub-title">Instant automation tools for fast animation workflows</span>
+                    </div>
+                </div>
+                <div class="cat-header-right">
+                    <span class="cat-count-pill">3/33 Tools</span>
+                    <span class="accordion-arrow">▼</span>
+                </div>
+            </summary>
+            <div class="tool-list">
+
+	<!-- Tool 1 Smart Locomotion PRO -->
+                <div class="btn-tool" data-tool-id="smart_locomotion" data-tags="locomotion pro" onclick="selectTool(this, 'TY Smart Locomotion Pro')">
+                    <div class="tool-left-col">
+                        <div class="tool-icon-box ib-blue">🚶</div>
+                        <div class="tool-info-col">
+                            <div class="tool-title-row">
+                                <span class="tool-name">Smart Locomotion Pro</span>
+                                <span class="badge-crown" title="Pro Master Tool">👑</span>
+                            </div>
+                            <span class="tool-desc">Generate walk, run, jump and body kinetics</span>
+                        </div>
+                    </div>
+                    <div class="tool-right-col" onclick="event.stopPropagation()">
+                        <button type="button" class="btn-star-pin" onclick="toggleFavoriteTool('smart_locomotion', event)" title="Pin to Favorites">☆</button>
+                        <button type="button" class="btn-run-action" onclick="executeRunButton(this, 'TY Smart Locomotion Pro', event)">RUN</button>
+                        <button type="button" class="btn-dots-guide" onclick="openToolGuideModal('smart_locomotion', event)" title="Tool Guide &amp; Docs">•••</button>
+                    </div>
+                </div>
+
+	<!-- Tool 2 (PRO) -->
+                <div class="btn-tool" data-tool-id="one_click_rig" data-tags="rigging pro" onclick="selectTool(this, 'TY One Click Smart Rigging')">
+                    <div class="tool-left-col">
+                        <div class="tool-icon-box ib-purple">⚙️</div>
+                        <div class="tool-info-col">
+                            <div class="tool-title-row">
+                                <span class="tool-name">One Click Smart Rigging</span>
+                                <span class="badge-crown" title="Pro Master Tool">👑</span>
+                            </div>
+                            <span class="tool-desc">Auto rig character hierarchies in one click</span>
+                        </div>
+                    </div>
+                    <div class="tool-right-col" onclick="event.stopPropagation()">
+                        <button type="button" class="btn-star-pin" onclick="toggleFavoriteTool('one_click_rig', event)" title="Pin to Favorites">☆</button>
+                        <button type="button" class="btn-run-action" onclick="executeRunButton(this, 'TY One Click Smart Rigging', event)">RUN</button>
+                        <button type="button" class="btn-dots-guide" onclick="openToolGuideModal('one_click_rig', event)" title="Tool Guide &amp; Docs">•••</button>
+                    </div>
+                </div>
+
+	<!-- Tool 3 -->
+<div class="btn-tool" data-tool-id="adv_eyeblink" data-tags="locomotion rigging" onclick="selectTool(this, 'TY Advance Auto Eyeblink Generator')">
+    <div class="tool-left-col">
+        <div class="tool-icon-box ib-amber">👁️</div>
+        <div class="tool-info-col">
+            <div class="tool-title-row">
+                <span class="tool-name">Advance Auto Eyeblink Generator</span>
+		<span class="badge-crown" title="Pro Master Tool">👑</span>
+            </div>
+            <span class="tool-desc">Generate organic micro-blink variations and rhythmic eye holds</span>
+        </div>
+    </div>
+    <div class="tool-right-col" onclick="event.stopPropagation()">
+        <button type="button" class="btn-star-pin" onclick="toggleFavoriteTool('adv_eyeblink', event)" title="Pin to Favorites">☆</button>
+        <button type="button" class="btn-run-action" onclick="executeRunButton(this, 'TY Advance Auto Eyeblink Generator', event)">RUN</button>
+        <button type="button" class="btn-dots-guide" onclick="openToolGuideModal('adv_eyeblink', event)" title="Tool Guide &amp; Docs">•••</button>
+    </div>
+</div>
+	    </div>
+        </details>
+
+
+        <!-- 2. AI TOOLS -->
+        <details class="category-block cat-theme-ai" open>
+            <summary class="cat-header">
+                <div class="cat-header-left">
+                    <div class="cat-badge-icon icon-ai">✨</div>
+                    <div class="cat-title-wrap">
+                        <span class="cat-main-title">AI TOOLS</span>
+                        <span class="cat-sub-title">Neural &amp; automated AI-powered animation assistants</span>
+                    </div>
+                </div>
+                <div class="cat-header-right">
+                    <span class="cat-count-pill">3/33 Tools</span>
+                    <span class="accordion-arrow">▼</span>
+                </div>
+            </summary>
+            <div class="tool-list">
+
+		<!-- Tool 1: AI Auto Lip-Sync Generator -->
+<div class="btn-tool" data-tool-id="auto_lipsync_ai" data-tags="locomotion rigging" onclick="openLipSyncModal()">
+    <div class="tool-left-col">
+        <div class="tool-icon-box ib-cyan">🗣️</div>
+        <div class="tool-info-col">
+            <div class="tool-title-row">
+                <span class="tool-name">Auto Lip-Sync Generator</span>
+                <span class="badge-crown" title="Pro Master Tool">👑</span>
+            </div>
+            <span class="tool-desc">Auto phoneme lip-sync from speech audio using Rhubarb & AI</span>
+        </div>
+    </div>
+    <div class="tool-right-col" onclick="event.stopPropagation()">
+        <button type="button" class="btn-star-pin" onclick="toggleFavoriteTool('auto_lipsync_ai', event)" title="Pin to Favorites">☆</button>
+        <button type="button" class="btn-run-action" onclick="openLipSyncModal()">RUN</button>
+<button type="button" class="btn-dots-guide" onclick="openToolGuideModal('auto_lipsync_ai', event)" title="Tool Guide &amp; Docs">•••</button>
+    		    </div>
+		</div>
+
+	<!-- Tool 2: One Click Bitmap Stroke Tracer (Clean & Production Ready) -->
+<div class="btn-tool" data-tool-id="bitmap_stroke_tracer" data-tags="align" onclick="executeSingleLineTracer(this)">
+    <div class="tool-left-col">
+        <div class="tool-icon-box ib-purple">🖋️</div>
+        <div class="tool-info-col">
+            <div class="tool-title-row">
+                <span class="tool-name">One Click Bitmap Stroke Tracer</span>
+		<span class="badge-crown" title="Pro Master Tool">👑</span>
+            </div>
+            <span class="tool-desc">Extract pure vector line-art outlines from sketches and raster inks</span>
+        </div>
+    </div>
+    <div class="tool-right-col" onclick="event.stopPropagation()">
+        <button type="button" class="btn-star-pin" onclick="toggleFavoriteTool('bitmap_stroke_tracer', event)" title="Pin to Favorites">☆</button>
+        <button type="button" class="btn-run-action" onclick="executeSingleLineTracer(this)">RUN</button>
+        <button type="button" class="btn-dots-guide" onclick="openToolGuideModal('bitmap_stroke_tracer', event)" title="Tool Guide &amp; Docs">•••</button>
+    </div>
+</div>
+
+	<!-- Tool 3: Smart AI Vector Gap Healer Pro (Watertight Seal) -->
+		<div class="btn-tool" data-tool-id="ai_gap_healer" data-tags="align tweens pro" onclick="executeAiGapHealer(this)">
+		    <div class="tool-left-col">
+		        <div class="tool-icon-box ib-cyan">🩹</div>
+		        <div class="tool-info-col">
+		            <div class="tool-title-row">
+		                <span class="tool-name">Stroke Gap Healer Pro</span>
+		            </div>
+		            <span class="tool-desc">Auto-extend & weld broken line gaps into watertight vector shapes</span>
+		        </div>
+		    </div>
+		    <div class="tool-right-col" onclick="event.stopPropagation()">
+		        <button type="button" class="btn-star-pin" onclick="toggleFavoriteTool('ai_gap_healer', event)" title="Pin to Favorites">☆</button>
+		        <button type="button" class="btn-run-action" onclick="executeAiGapHealer(this)">RUN</button>
+		        <button type="button" class="btn-dots-guide" onclick="openToolGuideModal('ai_gap_healer', event)" title="Tool Guide &amp; Docs">•••</button>
+		    </div>
+		</div>
+		</div>
+        </details>
+
+
+	<!-- 3. 10X SPEED TOOLS -->
+        <details class="category-block cat-theme-speed" open>
+            <summary class="cat-header">
+                <div class="cat-header-left">
+                    <div class="cat-badge-icon icon-speed">🚀</div>
+                    <div class="cat-title-wrap">
+                        <span class="cat-main-title">10X SPEED TOOLS</span>
+                        <span class="cat-sub-title">Accelerate animation workflows &amp; supercharge production velocity</span>
+                    </div>
+                </div>
+                <div class="cat-header-right">
+                    <span class="cat-count-pill">8/33 Tools</span>
+                    <span class="accordion-arrow">▼</span>
+                </div>
+            </summary>
+            <div class="tool-list">
+
+	<!-- Tool 1 -->
+                <div class="btn-tool" data-tool-id="snap_guide" data-tags="tweens align" onclick="selectTool(this, 'TY Auto Snap and Guide Tween')">
+                    <div class="tool-left-col">
+                        <div class="tool-icon-box ib-red">🧲</div>
+                        <div class="tool-info-col">
+                            <div class="tool-title-row">
+                                <span class="tool-name">Auto Snap &amp; Guide Tween</span>
+                            </div>
+                            <span class="tool-desc">Snap symbols to motion guides smoothly</span>
+                        </div>
+                    </div>
+                    <div class="tool-right-col" onclick="event.stopPropagation()">
+                        <button type="button" class="btn-star-pin" onclick="toggleFavoriteTool('snap_guide', event)" title="Pin to Favorites">☆</button>
+                        <button type="button" class="btn-run-action" onclick="executeRunButton(this, 'TY Auto Snap and Guide Tween', event)">RUN</button>
+                        <button type="button" class="btn-dots-guide" onclick="openToolGuideModal('snap_guide', event)" title="Tool Guide &amp; Docs">•••</button>
+                    </div>
+                </div>
+
+	<!-- Tool 2 -->
+                <div class="btn-tool" data-tool-id="eye_blink" data-tags="locomotion rigging" onclick="selectTool(this, 'TY Auto Eye-Blink Inserter')">
+                    <div class="tool-left-col">
+                        <div class="tool-icon-box ib-amber">👁️</div>
+                        <div class="tool-info-col">
+                            <div class="tool-title-row">
+                                <span class="tool-name">Auto Eye-Blink Inserter</span>
+                            </div>
+                            <span class="tool-desc">Add natural, randomized blinks automatically</span>
+                        </div>
+                    </div>
+                    <div class="tool-right-col" onclick="event.stopPropagation()">
+                        <button type="button" class="btn-star-pin" onclick="toggleFavoriteTool('eye_blink', event)" title="Pin to Favorites">☆</button>
+                        <button type="button" class="btn-run-action" onclick="executeRunButton(this, 'TY Auto Eye-Blink Inserter', event)">RUN</button>
+                        <button type="button" class="btn-dots-guide" onclick="openToolGuideModal('eye_blink', event)" title="Tool Guide &amp; Docs">•••</button>
+                    </div>
+                </div>
+
+	<!-- Tool 3 -->
+                <div class="btn-tool" data-tool-id="auto_talking" data-tags="locomotion" onclick="selectTool(this, 'TY Smart Auto Random Talking')">
+                    <div class="tool-left-col">
+                        <div class="tool-icon-box ib-pink">🗣️</div>
+                        <div class="tool-info-col">
+                            <div class="tool-title-row">
+                                <span class="tool-name">Smart Auto Random Talking</span>
+                            </div>
+                            <span class="tool-desc">Generate realistic talking mouth animation</span>
+                        </div>
+                    </div>
+                    <div class="tool-right-col" onclick="event.stopPropagation()">
+                        <button type="button" class="btn-star-pin" onclick="toggleFavoriteTool('auto_talking', event)" title="Pin to Favorites">☆</button>
+                        <button type="button" class="btn-run-action" onclick="executeRunButton(this, 'TY Smart Auto Random Talking', event)">RUN</button>
+                        <button type="button" class="btn-dots-guide" onclick="openToolGuideModal('auto_talking', event)" title="Tool Guide &amp; Docs">•••</button>
+                    </div>
+                </div>
+
+	<!-- Tool 4 -->
+                <div class="btn-tool" data-tool-id="camera_shake" data-tags="camera timeline" onclick="selectTool(this, 'TY Camera Shake FX')">
+                    <div class="tool-left-col">
+                        <div class="tool-icon-box ib-red">💥</div>
+                        <div class="tool-info-col">
+                            <div class="tool-title-row">
+                                <span class="tool-name">Camera Shake FX</span>
+                            </div>
+                            <span class="tool-desc">Add dynamic procedural camera vibrations</span>
+                        </div>
+                    </div>
+                    <div class="tool-right-col" onclick="event.stopPropagation()">
+                        <button type="button" class="btn-star-pin" onclick="toggleFavoriteTool('camera_shake', event)" title="Pin to Favorites">☆</button>
+                        <button type="button" class="btn-run-action" onclick="executeRunButton(this, 'TY Camera Shake FX', event)">RUN</button>
+                        <button type="button" class="btn-dots-guide" onclick="openToolGuideModal('camera_shake', event)" title="Tool Guide &amp; Docs">•••</button>
+                    </div>
+                </div>
+
+	<!-- Tool 5 -->
+                <div class="btn-tool" data-tool-id="key_looper" data-tags="timeline timecode" onclick="selectTool(this, 'TY Smart Key Looper')">
+                    <div class="tool-left-col">
+                        <div class="tool-icon-box ib-purple">🔄</div>
+                        <div class="tool-info-col">
+                            <div class="tool-title-row">
+                                <span class="tool-name">Smart Key Looper</span>
+                            </div>
+                            <span class="tool-desc">Create seamless timeline loops effortlessly</span>
+                        </div>
+                    </div>
+                    <div class="tool-right-col" onclick="event.stopPropagation()">
+                        <button type="button" class="btn-star-pin" onclick="toggleFavoriteTool('key_looper', event)" title="Pin to Favorites">☆</button>
+                        <button type="button" class="btn-run-action" onclick="executeRunButton(this, 'TY Smart Key Looper', event)">RUN</button>
+                        <button type="button" class="btn-dots-guide" onclick="openToolGuideModal('key_looper', event)" title="Tool Guide &amp; Docs">•••</button>
+                    </div>
+                </div>
+
+	<!-- Tool 6: TY Layer and Symbol Renamer -->
+                <div class="btn-tool" data-tool-id="layer_symbol_renamer" data-tags="timeline keyframes pro renamer" onclick="selectTool(this, 'TY Layer and Symbol Renamer')">
+                    <div class="tool-left-col">
+                        <div class="tool-icon-box ib-cyan">🏷️</div>
+                        <div class="tool-info-col">
+                            <div class="tool-title-row">
+                                <span class="tool-name">Layer &amp; Symbol Renamer</span>
+                            </div>
+                            <span class="tool-desc">Smart rename timeline layers and nested character rig symbols</span>
+                        </div>
+                    </div>
+                    <div class="tool-right-col" onclick="event.stopPropagation()">
+                        <button type="button" class="btn-star-pin" onclick="toggleFavoriteTool('layer_symbol_renamer', event)" title="Pin to Favorites">☆</button>
+                        <button type="button" class="btn-run-action" onclick="executeRunButton(this, 'TY Layer and Symbol Renamer', event)">RUN</button>
+                        <button type="button" class="btn-dots-guide" onclick="openToolGuideModal('layer_symbol_renamer', event)" title="Tool Guide &amp; Docs">•••</button>
+                    </div>
+                </div>
+
+	<!-- Tool 7: Bbitmap to Fill Tracer -->
+<div class="btn-tool" data-tool-id="bitmap_fill_tracer" data-tags="align" onclick="selectTool(this, 'TY One Click Bitmap to Fill Tracer')">
+    <div class="tool-left-col">
+        <div class="tool-icon-box ib-amber">🎨</div>
+        <div class="tool-info-col">
+            <div class="tool-title-row">
+                <span class="tool-name">One Click Bitmap to Fill Tracer</span>
+            </div>
+            <span class="tool-desc">Vectorize raster images into solid, editable vector color fills</span>
+        </div>
+    </div>
+    <div class="tool-right-col" onclick="event.stopPropagation()">
+        <button type="button" class="btn-star-pin" onclick="toggleFavoriteTool('bitmap_fill_tracer', event)" title="Pin to Favorites">☆</button>
+        <button type="button" class="btn-run-action" onclick="executeRunButton(this, 'TY One Click Bitmap to Fill Tracer', event)">RUN</button>
+        <button type="button" class="btn-dots-guide" onclick="openToolGuideModal('bitmap_fill_tracer', event)" title="Tool Guide &amp; Docs">•••</button>
+    </div>
+</div>
+
+	<!-- Tool 8 -->
+<div class="btn-tool" data-tool-id="symbol_type_switcher" data-tags="align timeline" onclick="selectTool(this, 'TY Auto Symbol Type Switcher')">
+    <div class="tool-left-col">
+        <div class="tool-icon-box ib-blue">🔁</div>
+        <div class="tool-info-col">
+            <div class="tool-title-row">
+                <span class="tool-name">Auto Symbol Type Switcher</span>
+            </div>
+            <span class="tool-desc">Batch toggle Graphic, MovieClip and Button instances seamlessly</span>
+        </div>
+    </div>
+    <div class="tool-right-col" onclick="event.stopPropagation()">
+        <button type="button" class="btn-star-pin" onclick="toggleFavoriteTool('symbol_type_switcher', event)" title="Pin to Favorites">☆</button>
+        <button type="button" class="btn-run-action" onclick="executeRunButton(this, 'TY Auto Symbol Type Switcher', event)">RUN</button>
+        <button type="button" class="btn-dots-guide" onclick="openToolGuideModal('symbol_type_switcher', event)" title="Tool Guide &amp; Docs">•••</button>
+		    </div>
+		</div>
+	    </div>
+        </details>
+
+
+	<!-- 4. ALIGHNEMENTS & TWEENS -->
+        <details class="category-block cat-theme-purple" open>
+            <summary class="cat-header">
+                <div class="cat-header-left">
+                    <div class="cat-badge-icon icon-purple">🎛️</div>
+                    <div class="cat-title-wrap">
+                        <span class="cat-main-title">ALIGNMENTS &amp; TWEENS</span>
+                        <span class="cat-sub-title">Precision alignment and easing controllers</span>
+                    </div>
+                </div>
+                <div class="cat-header-right">
+                    <span class="cat-count-pill">8/33 Tools</span>
+                    <span class="accordion-arrow">▼</span>
+                </div>
+            </summary>
+            <div class="tool-list">
+
+	<!-- Tool 1 -->
+                <div class="btn-tool" data-tool-id="smart_ease" data-tags="tweens" onclick="selectTool(this, 'TY Smart Ease in-out')">
+                    <div class="tool-left-col">
+                        <div class="tool-icon-box ib-purple">📈</div>
+                        <div class="tool-info-col">
+                            <div class="tool-title-row">
+                                <span class="tool-name">Smart Ease in-out</span>
+                            </div>
+                            <span class="tool-desc">Apply natural velocity curves and easing</span>
+                        </div>
+                    </div>
+                    <div class="tool-right-col" onclick="event.stopPropagation()">
+                        <button type="button" class="btn-star-pin" onclick="toggleFavoriteTool('smart_ease', event)" title="Pin to Favorites">☆</button>
+                        <button type="button" class="btn-run-action" onclick="executeRunButton(this, 'TY Smart Ease in-out', event)">RUN</button>
+                        <button type="button" class="btn-dots-guide" onclick="openToolGuideModal('smart_ease', event)" title="Tool Guide &amp; Docs">•••</button>
+                    </div>
+                </div>
+
+	<!-- Tool 2 -->
+                <div class="btn-tool" data-tool-id="auto_tween_toggle" data-tags="tweens" onclick="selectTool(this, 'TY Smart Auto Tween Toggle')">
+                    <div class="tool-left-col">
+                        <div class="tool-icon-box ib-amber">⚡</div>
+                        <div class="tool-info-col">
+                            <div class="tool-title-row">
+                                <span class="tool-name">Smart Auto Tween Toggle</span>
+                            </div>
+                            <span class="tool-desc">Instant toggle, swap, or remove classic tweens</span>
+                        </div>
+                    </div>
+                    <div class="tool-right-col" onclick="event.stopPropagation()">
+                        <button type="button" class="btn-star-pin" onclick="toggleFavoriteTool('auto_tween_toggle', event)" title="Pin to Favorites">☆</button>
+                        <button type="button" class="btn-run-action" onclick="executeRunButton(this, 'TY Smart Auto Tween Toggle', event)">RUN</button>
+                        <button type="button" class="btn-dots-guide" onclick="openToolGuideModal('auto_tween_toggle', event)" title="Tool Guide &amp; Docs">•••</button>
+                    </div>
+                </div>
+
+	<!-- Tool 3: Keyframe Gap Manager -->
+<div class="btn-tool" data-tool-id="keyframe_gap_manager" data-tags="timeline keyframes" onclick="selectTool(this, 'TY Keyframe Gap Manager')">
+    <div class="tool-left-col">
+        <div class="tool-icon-box ib-cyan">↔️</div>
+        <div class="tool-info-col">
+            <div class="tool-title-row">
+                <span class="tool-name">Keyframe Gap Manager</span>
+            </div>
+            <span class="tool-desc">Expand, contract, and equalize frame gaps between keys</span>
+        </div>
+    </div>
+    <div class="tool-right-col" onclick="event.stopPropagation()">
+        <button type="button" class="btn-star-pin" onclick="toggleFavoriteTool('keyframe_gap_manager', event)" title="Pin to Favorites">☆</button>
+        <button type="button" class="btn-run-action" onclick="executeRunButton(this, 'TY Keyframe Gap Manager', event)">RUN</button>
+        <button type="button" class="btn-dots-guide" onclick="openToolGuideModal('keyframe_gap_manager', event)" title="Tool Guide &amp; Docs">•••</button>
+    </div>
+</div>
+
+	<!-- Tool 4: TY RigCutter Pro -->
+<div class="btn-tool" data-tool-id="rig_cutter" data-tags="rigging locomotion pro" onclick="selectTool(this, 'TY RigCutter Pro')">
+    <div class="tool-left-col">
+        <div class="tool-icon-box ib-red">✂️</div>
+        <div class="tool-info-col">
+            <div class="tool-title-row">
+                <span class="tool-name">RigCutter Pro</span>
+            </div>
+            <span class="tool-desc">Slice grouped artwork along drawn lines into rig parts</span>
+        </div>
+    </div>
+    <div class="tool-right-col" onclick="event.stopPropagation()">
+        <button type="button" class="btn-star-pin" onclick="toggleFavoriteTool('rig_cutter', event)" title="Pin to Favorites">☆</button>
+        <button type="button" class="btn-run-action" onclick="executeRunButton(this, 'TY RigCutter Pro', event)">RUN</button>
+        <button type="button" class="btn-dots-guide" onclick="openToolGuideModal('rig_cutter', event)" title="Tool Guide &amp; Docs">•••</button>
+    </div>
+</div>
+
+	<!-- Tool 5 -->
+                <div class="btn-tool" data-tool-id="circle_center" data-tags="align" onclick="selectTool(this, 'TY Smart Circle Center')">
+                    <div class="tool-left-col">
+                        <div class="tool-icon-box ib-blue">⭕</div>
+                        <div class="tool-info-col">
+                            <div class="tool-title-row">
+                                <span class="tool-name">Smart Circle Center</span>
+                            </div>
+                            <span class="tool-desc">Lock and center circular rotational orbits</span>
+                        </div>
+                    </div>
+                    <div class="tool-right-col" onclick="event.stopPropagation()">
+                        <button type="button" class="btn-star-pin" onclick="toggleFavoriteTool('circle_center', event)" title="Pin to Favorites">☆</button>
+                        <button type="button" class="btn-run-action" onclick="executeRunButton(this, 'TY Smart Circle Center', event)">RUN</button>
+                        <button type="button" class="btn-dots-guide" onclick="openToolGuideModal('circle_center', event)" title="Tool Guide &amp; Docs">•••</button>
+                    </div>
+                </div>
+
+	<!-- Tool 6 -->
+                <div class="btn-tool" data-tool-id="pivot_align" data-tags="align" onclick="selectTool(this, 'TY Smart Pivot Alignment')">
+                    <div class="tool-left-col">
+                        <div class="tool-icon-box ib-emerald">📌</div>
+                        <div class="tool-info-col">
+                            <div class="tool-title-row">
+                                <span class="tool-name">Smart Pivot Alignment</span>
+                            </div>
+                            <span class="tool-desc">Instant 9-point anchor registration transform</span>
+                        </div>
+                    </div>
+                    <div class="tool-right-col" onclick="event.stopPropagation()">
+                        <button type="button" class="btn-star-pin" onclick="toggleFavoriteTool('pivot_align', event)" title="Pin to Favorites">☆</button>
+                        <button type="button" class="btn-run-action" onclick="executeRunButton(this, 'TY Smart Pivot Alignment', event)">RUN</button>
+                        <button type="button" class="btn-dots-guide" onclick="openToolGuideModal('pivot_align', event)" title="Tool Guide &amp; Docs">•••</button>
+                    </div>
+                </div>
+
+	<!-- Tool 7 -->
+<div class="btn-tool" data-tool-id="keys_tweens_cleaner" data-tags="timeline tweens" onclick="selectTool(this, 'TY Keys and Tweens Cleaner')">
+    <div class="tool-left-col">
+        <div class="tool-icon-box ib-red">🧹</div>
+        <div class="tool-info-col">
+            <div class="tool-title-row">
+                <span class="tool-name">Keys &amp; Tweens Cleaner</span>
+            </div>
+            <span class="tool-desc">Clean redundant duplicate frames, ghost keys and broken classic tweens</span>
+        </div>
+    </div>
+    <div class="tool-right-col" onclick="event.stopPropagation()">
+        <button type="button" class="btn-star-pin" onclick="toggleFavoriteTool('keys_tweens_cleaner', event)" title="Pin to Favorites">☆</button>
+        <button type="button" class="btn-run-action" onclick="executeRunButton(this, 'TY Keys and Tweens Cleaner', event)">RUN</button>
+        <button type="button" class="btn-dots-guide" onclick="openToolGuideModal('keys_tweens_cleaner', event)" title="Tool Guide &amp; Docs">•••</button>
+    </div>
+</div>
+
+	<!-- Tool 8 -->
+                <div class="btn-tool" data-tool-id="timecode_sync" data-tags="timeline timecode" onclick="selectTool(this, 'TY Inner Keyframe Timecode Sync')">
+                    <div class="tool-left-col">
+                        <div class="tool-icon-box ib-emerald">⏳</div>
+                        <div class="tool-info-col">
+                            <div class="tool-title-row">
+                                <span class="tool-name">Inner Keyframe Timecode Sync</span>
+                            </div>
+                            <span class="tool-desc">Sync nested symbol keyframes with main timeline</span>
+                        </div>
+                    </div>
+                    <div class="tool-right-col" onclick="event.stopPropagation()">
+                        <button type="button" class="btn-star-pin" onclick="toggleFavoriteTool('timecode_sync', event)" title="Pin to Favorites">☆</button>
+                        <button type="button" class="btn-run-action" onclick="executeRunButton(this, 'TY Inner Keyframe Timecode Sync', event)">RUN</button>
+                        <button type="button" class="btn-dots-guide" onclick="openToolGuideModal('timecode_sync', event)" title="Tool Guide &amp; Docs">•••</button>
+                    </div>
+                </div>
+	      </div>
+        </details>
+
+
+	<!-- 5. KEYFRAMES & TIMELINE -->
+        <details class="category-block cat-theme-green" open>
+            <summary class="cat-header">
+                <div class="cat-header-left">
+                    <div class="cat-badge-icon icon-green">⏱️</div>
+                    <div class="cat-title-wrap">
+                        <span class="cat-main-title">KEYFRAMES &amp; TIMELINE</span>
+                        <span class="cat-sub-title">Boost timeline workflow and keyframe manipulation</span>
+                    </div>
+                </div>
+                <div class="cat-header-right">
+                    <span class="cat-count-pill">7/33 Tools</span>
+                    <span class="accordion-arrow">▼</span>
+                </div>
+            </summary>
+            <div class="tool-list">
+
+
+		<!-- Tool 1: TY Timeline Builder Pro -->
+                <div class="btn-tool" data-tool-id="timeline_builder_pro" data-tags="timeline keyframes pro builder" onclick="selectTool(this, 'TY Timeline Builder Pro')">
+                    <div class="tool-left-col">
+                        <div class="tool-icon-box ib-cyan">🏗️</div>
+                        <div class="tool-info-col">
+                            <div class="tool-title-row">
+                                <span class="tool-name">Timeline Builder Pro</span>
+                                <span class="badge-crown" title="Pro Master Tool">👑</span>
+                            </div>
+                            <span class="tool-desc">Build 5-folder studio hierarchy or custom layer setups</span>
+                        </div>
+                    </div>
+                    <div class="tool-right-col" onclick="event.stopPropagation()">
+                        <button type="button" class="btn-star-pin" onclick="toggleFavoriteTool('timeline_builder_pro', event)" title="Pin to Favorites">☆</button>
+                        <button type="button" class="btn-run-action" onclick="executeRunButton(this, 'TY Timeline Builder Pro', event)">RUN</button>
+                        <button type="button" class="btn-dots-guide" onclick="openToolGuideModal('timeline_builder_pro', event)" title="Tool Guide &amp; Docs">•••</button>
+                    </div>
+                </div>
+
+		<!-- Tool 2 -->
+<div class="btn-tool" data-tool-id="timeline_symbol_sync" data-tags="timeline timecode" onclick="selectTool(this, 'TY Auto Timeline and Symbol Synchronizer')">
+    <div class="tool-left-col">
+        <div class="tool-icon-box ib-emerald">⏱️</div>
+        <div class="tool-info-col">
+            <div class="tool-title-row">
+                <span class="tool-name">Auto Timeline &amp; Symbol Synchronizer</span>
+            </div>
+            <span class="tool-desc">Lock and harmonize parent timeline playheads with nested loops</span>
+        </div>
+    </div>
+    <div class="tool-right-col" onclick="event.stopPropagation()">
+        <button type="button" class="btn-star-pin" onclick="toggleFavoriteTool('timeline_symbol_sync', event)" title="Pin to Favorites">☆</button>
+        <button type="button" class="btn-run-action" onclick="executeRunButton(this, 'TY Auto Timeline and Symbol Synchronizer', event)">RUN</button>
+        <button type="button" class="btn-dots-guide" onclick="openToolGuideModal('timeline_symbol_sync', event)" title="Tool Guide &amp; Docs">•••</button>
+    </div>
+</div>
+
+                <!-- Tool 3 -->
+                <div class="btn-tool" data-tool-id="auto_movement_keys" data-tags="timeline" onclick="selectTool(this, 'TY Auto Movement Keys Inserter')">
+                    <div class="tool-left-col">
+                        <div class="tool-icon-box ib-green">🔑</div>
+                        <div class="tool-info-col">
+                            <div class="tool-title-row">
+                                <span class="tool-name">Auto Movement Keys Inserter</span>
+                            </div>
+                            <span class="tool-desc">Insert keyframes for movement automatically</span>
+                        </div>
+                    </div>
+                    <div class="tool-right-col" onclick="event.stopPropagation()">
+                        <button type="button" class="btn-star-pin" onclick="toggleFavoriteTool('auto_movement_keys', event)" title="Pin to Favorites">☆</button>
+                        <button type="button" class="btn-run-action" onclick="executeRunButton(this, 'TY Auto Movement Keys Inserter', event)">RUN</button>
+                        <button type="button" class="btn-dots-guide" onclick="openToolGuideModal('auto_movement_keys', event)" title="Tool Guide &amp; Docs">•••</button>
+                    </div>
+                </div>
+
+                <!-- Tool 4 -->
+                <div class="btn-tool" data-tool-id="frame_extender" data-tags="timeline" onclick="selectTool(this, 'TY Bulk Graphic Frame Extender')">
+                    <div class="tool-left-col">
+                        <div class="tool-icon-box ib-emerald">📐</div>
+                        <div class="tool-info-col">
+                            <div class="tool-title-row">
+                                <span class="tool-name">Bulk Graphic Frame Extender</span>
+                            </div>
+                            <span class="tool-desc">Extend multiple symbol frames across layers</span>
+                        </div>
+                    </div>
+                    <div class="tool-right-col" onclick="event.stopPropagation()">
+                        <button type="button" class="btn-star-pin" onclick="toggleFavoriteTool('frame_extender', event)" title="Pin to Favorites">☆</button>
+                        <button type="button" class="btn-run-action" onclick="executeRunButton(this, 'TY Bulk Graphic Frame Extender', event)">RUN</button>
+                        <button type="button" class="btn-dots-guide" onclick="openToolGuideModal('frame_extender', event)" title="Tool Guide &amp; Docs">•••</button>
+                    </div>
+                </div>
+
+                <!-- Tool 5 -->
+                <div class="btn-tool" data-tool-id="prefix_renamer" data-tags="timeline" onclick="selectTool(this, 'TY Bulk Symbol Prefix Renamer')">
+                    <div class="tool-left-col">
+                        <div class="tool-icon-box ib-amber">✏️</div>
+                        <div class="tool-info-col">
+                            <div class="tool-title-row">
+                                <span class="tool-name">Bulk Symbol Prefix Renamer</span>
+                            </div>
+                            <span class="tool-desc">Batch rename library symbols with prefixes</span>
+                        </div>
+                    </div>
+                    <div class="tool-right-col" onclick="event.stopPropagation()">
+                        <button type="button" class="btn-star-pin" onclick="toggleFavoriteTool('prefix_renamer', event)" title="Pin to Favorites">☆</button>
+                        <button type="button" class="btn-run-action" onclick="executeRunButton(this, 'TY Bulk Symbol Prefix Renamer', event)">RUN</button>
+                        <button type="button" class="btn-dots-guide" onclick="openToolGuideModal('prefix_renamer', event)" title="Tool Guide &amp; Docs">•••</button>
+                    </div>
+                </div>
+
+                <!-- Tool 6 -->
+                <div class="btn-tool" data-tool-id="in_between_splitter" data-tags="timeline inbetween" onclick="selectTool(this, 'TY In-Between Splitter')">
+                    <div class="tool-left-col">
+                        <div class="tool-icon-box ib-cyan">✂️</div>
+                        <div class="tool-info-col">
+                            <div class="tool-title-row">
+                                <span class="tool-name">In-Between Splitter</span>
+                            </div>
+                            <span class="tool-desc">Generate rhythmic in-betweens automatically</span>
+                        </div>
+                    </div>
+                    <div class="tool-right-col" onclick="event.stopPropagation()">
+                        <button type="button" class="btn-star-pin" onclick="toggleFavoriteTool('in_between_splitter', event)" title="Pin to Favorites">☆</button>
+                        <button type="button" class="btn-run-action" onclick="executeRunButton(this, 'TY In-Between Splitter', event)">RUN</button>
+                        <button type="button" class="btn-dots-guide" onclick="openToolGuideModal('in_between_splitter', event)" title="Tool Guide &amp; Docs">•••</button>
+                    </div>
+                </div>
+
+                
+
+                <!-- Tool 7 -->
+                <div class="btn-tool" data-tool-id="time_shifter" data-tags="timeline" onclick="selectTool(this, 'TY Smart Time Shifter and Retimer')">
+                    <div class="tool-left-col">
+                        <div class="tool-icon-box ib-blue">🕒</div>
+                        <div class="tool-info-col">
+                            <div class="tool-title-row">
+                                <span class="tool-name">Smart Time Shifter &amp; Retimer</span>
+                            </div>
+                            <span class="tool-desc">Speed up, slow down, and offset animations</span>
+                        </div>
+                    </div>
+                    <div class="tool-right-col" onclick="event.stopPropagation()">
+                        <button type="button" class="btn-star-pin" onclick="toggleFavoriteTool('time_shifter', event)" title="Pin to Favorites">☆</button>
+                        <button type="button" class="btn-run-action" onclick="executeRunButton(this, 'TY Smart Time Shifter and Retimer', event)">RUN</button>
+                        <button type="button" class="btn-dots-guide" onclick="openToolGuideModal('time_shifter', event)" title="Tool Guide &amp; Docs">•••</button>
+                    </div>
+                </div>
+            </div>
+        </details>
+
+
+	<!-- 6. OTHERS / UTILITIES -->
+        <details class="category-block cat-theme-others" open>
+            <summary class="cat-header">
+                <div class="cat-header-left">
+                    <div class="cat-badge-icon icon-others">🛠️</div>
+                    <div class="cat-title-wrap">
+                        <span class="cat-main-title">OTHERS &amp; UTILITIES</span>
+                        <span class="cat-sub-title">Handy studio utilities, diagnostic &amp; asset management tools</span>
+                    </div>
+                </div>
+                <div class="cat-header-right">
+                    <span class="cat-count-pill">4/33 Tools</span>
+                    <span class="accordion-arrow">▼</span>
+                </div>
+            </summary>
+            <div class="tool-list">
+
+	<!-- Tool 1 -->
+                <div class="btn-tool" data-tool-id="overlap_follow" data-tags="locomotion tweens" onclick="selectTool(this, 'TY Overlap and Follow-Through')">
+                    <div class="tool-left-col">
+                        <div class="tool-icon-box ib-cyan">🌊</div>
+                        <div class="tool-info-col">
+                            <div class="tool-title-row">
+                                <span class="tool-name">Overlap and Follow-Through</span>
+                            </div>
+                            <span class="tool-desc">Add organic physical drag and secondary motion</span>
+                        </div>
+                    </div>
+                    <div class="tool-right-col" onclick="event.stopPropagation()">
+                        <button type="button" class="btn-star-pin" onclick="toggleFavoriteTool('overlap_follow', event)" title="Pin to Favorites">☆</button>
+                        <button type="button" class="btn-run-action" onclick="executeRunButton(this, 'TY Overlap and Follow-Through', event)">RUN</button>
+                        <button type="button" class="btn-dots-guide" onclick="openToolGuideModal('overlap_follow', event)" title="Tool Guide &amp; Docs">•••</button>
+                    </div>
+                </div>
+
+	<!-- Tool 2 -->
+<div class="btn-tool" data-tool-id="wingle_secondary_motion" data-tags="locomotion tweens" onclick="selectTool(this, 'TY Auto Wingle and Secondary Motion Generator')">
+    <div class="tool-left-col">
+        <div class="tool-icon-box ib-pink">〰️</div>
+        <div class="tool-info-col">
+            <div class="tool-title-row">
+                <span class="tool-name">Auto Wingle &amp; Secondary Motion Generator</span>
+            </div>
+            <span class="tool-desc">Add natural wave, hair flutter, and organic cloth physics curves</span>
+        </div>
+    </div>
+    <div class="tool-right-col" onclick="event.stopPropagation()">
+        <button type="button" class="btn-star-pin" onclick="toggleFavoriteTool('wingle_secondary_motion', event)" title="Pin to Favorites">☆</button>
+        <button type="button" class="btn-run-action" onclick="executeRunButton(this, 'TY Auto Wingle and Secondary Motion Generator', event)">RUN</button>
+        <button type="button" class="btn-dots-guide" onclick="openToolGuideModal('wingle_secondary_motion', event)" title="Tool Guide &amp; Docs">•••</button>
+ 		   </div>
+                </div>
+
+		<!-- Tool 3 -->
+<div class="btn-tool" data-tool-id="batch_exporter_bundler" data-tags="timeline pro" onclick="selectTool(this, 'TY Batch Exporter and Assets Bundler')">
+    <div class="tool-left-col">
+        <div class="tool-icon-box ib-green">📦</div>
+        <div class="tool-info-col">
+            <div class="tool-title-row">
+                <span class="tool-name">Batch Exporter &amp; Assets Bundler</span>
+            </div>
+            <span class="tool-desc">One-click batch bundle and export scene assets and libraries</span>
+        </div>
+    </div>
+    <div class="tool-right-col" onclick="event.stopPropagation()">
+        <button type="button" class="btn-star-pin" onclick="toggleFavoriteTool('batch_exporter_bundler', event)" title="Pin to Favorites">☆</button>
+        <button type="button" class="btn-run-action" onclick="executeRunButton(this, 'TY Batch Exporter and Assets Bundler', event)">RUN</button>
+        <button type="button" class="btn-dots-guide" onclick="openToolGuideModal('batch_exporter_bundler', event)" title="Tool Guide &amp; Docs">•••</button>
+    </div>
+</div>
+
+		<!-- Tool 4 -->
+<div class="btn-tool" data-tool-id="project_health_checker" data-tags="timeline" onclick="selectTool(this, 'TY Project Asset Health & Link Checker')">
+    <div class="tool-left-col">
+        <div class="tool-icon-box ib-emerald">🩺</div>
+        <div class="tool-info-col">
+            <div class="tool-title-row">
+                <span class="tool-name">Project Asset Health &amp; Link Checker</span>
+            </div>
+            <span class="tool-desc">Audit unlinked files, unused bloated symbols and memory bottlenecks</span>
+        </div>
+    </div>
+    <div class="tool-right-col" onclick="event.stopPropagation()">
+        <button type="button" class="btn-star-pin" onclick="toggleFavoriteTool('project_health_checker', event)" title="Pin to Favorites">☆</button>
+        <button type="button" class="btn-run-action" onclick="executeRunButton(this, 'TY Project Asset Health & Link Checker', event)">RUN</button>
+        <button type="button" class="btn-dots-guide" onclick="openToolGuideModal('project_health_checker', event)" title="Tool Guide &amp; Docs">•••</button>
+ 		   </div>
+		</div>
+            </div>
+        </details>
+
+    </div>
+
+    <!-- ================= 📖 ULTRA-PRO TOOL DOCUMENTATION & GUIDE MODAL ================= -->
+    <div id="toolGuideModalOverlay" class="ty-guide-modal-overlay" style="display: none;" onclick="closeToolGuideModal(event)">
+        <div class="ty-guide-modal-card" onclick="event.stopPropagation()">
+            <!-- Top Bar -->
+            <div class="guide-modal-header">
+                <div class="guide-header-left">
+                    <div class="guide-header-icon" id="guideModalIcon">⚙️</div>
+                    <div class="guide-header-text">
+                        <div class="guide-title-line">
+                            <h3 id="guideModalTitle">Tool Name</h3>
+                            <span id="guideModalCrown" class="badge-crown" style="display: none;">👑</span>
+                        </div>
+                        <span class="guide-category-tag" id="guideModalCategory">CATEGORY</span>
+                    </div>
+                </div>
+                <button type="button" class="btn-guide-close" onclick="closeToolGuideModal(event)" title="Close">✕</button>
+            </div>
+
+            <!-- Content Area -->
+            <div class="guide-modal-body">
+                <!-- Overview Box -->
+                <div class="guide-section">
+                    <span class="guide-sec-label">📌 Overview &amp; Purpose</span>
+                    <p class="guide-sec-text" id="guideModalOverview">Description...</p>
+                </div>
+
+                <!-- Step-by-Step Instructions -->
+                <div class="guide-section">
+                    <span class="guide-sec-label">⚡ How to Use</span>
+                    <div class="guide-steps-list" id="guideModalSteps">
+                        <!-- Dynamic Steps injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Pro Tips / Note -->
+                <div class="guide-tip-card">
+                    <span class="tip-icon">💡</span>
+                    <div class="tip-text-col">
+                        <strong>Pro Tip</strong>
+                        <span id="guideModalTip">Tip details...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Action Footer -->
+            <div class="guide-modal-footer">
+                <button type="button" class="btn-guide-cancel" onclick="closeToolGuideModal(event)">Dismiss</button>
+                <button type="button" class="btn-guide-launch" id="btnGuideLaunch" onclick="launchToolFromGuide()">
+                    <span>▶ Watch Tutorial</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+<!-- ================= MODERN 3-TAB BOTTOM NAVIGATION ================= -->
+    <div class="modern-footer-nav">
+        <!-- 1. STUDIO TOOLS TAB (DEFAULT ACTIVE) -->
+        <div class="footer-tab-item active" id="tabStudioTools" onclick="switchFooterTab('tools')">
+            <svg class="tab-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                <path d="M3.8 20.2l4.6-4.6"></path>
+            </svg>
+            <span class="tab-title">Studio Toolkits</span>
+        </div>
+
+        <!-- 2. ASSET MARKETPLACE TAB -->
+        <div class="footer-tab-item" id="tabMarketplace" onclick="switchFooterTab('marketplace')">
+            <svg class="tab-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l2-5h14l2 5"></path>
+                <path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z"></path>
+                <path d="M9 21v-7a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v7"></path>
+            </svg>
+            <span class="tab-title">Asset Marketplace</span>
+        </div>
+
+        <!-- VERTICAL DIVIDER -->
+        <div class="footer-nav-divider"></div>
+
+        <!-- 3. ACCOUNT TAB -->
+        <div class="footer-tab-item" id="tabAccount" onclick="switchFooterTab('account')">
+            <svg class="tab-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span class="tab-title">Account</span>
+        </div>
+	</div>
+<!-- BOTTOM COPYRIGHT BAR (AB YEH 100% DIKHEGA) -->
+    <div class="pro-copyright-bar">
+        © 2026 Rocco by Raceducater. All Rights Reserved.
+    </div>
+
+        <!-- ============================================================================
+     ⚙️ ULTRA-PRO 1:1 REFERENCE: ACCOUNT & SETTINGS MODAL (STUDIO TOOLKITS)
+     ============================================================================ -->
+<div id="accountModalPopup" class="account-popup-card-pro" onclick="event.stopPropagation()">
+    
+    <!-- 1. TOP BAR (HEADER & CLOSE) -->
+    <div class="pro-acc-header">
+    <div class="pro-acc-header-left">
+        <h2>Account &amp; Settings</h2>
+        <p>Manage your profile, preferences and subscriptions.</p>
+    </div>
+
+    <!-- ⚡ UPDATE BUTTON + CLOSE BUTTON (TOP RIGHT) -->
+    <div class="pro-acc-header-actions">
+        <button type="button" id="profileUpdateBtn" class="btn-pro-pill-update status-up-to-date" onclick="handleProfileUpdateBtnClick()" title="Check for Updates">
+            <span class="status-icon">✓</span> <span class="status-text">Updated</span>
+        </button>
+        <button type="button" class="pro-acc-close-btn" onclick="closeAccountPopup()" title="Close">✕</button>
+    </div>
+</div>
+
+    <!-- 2. SCROLL CONTENT AREA -->
+    <div class="pro-acc-scroll-content">
+
+        <!-- CARD 1: PROFILE & THEMES -->
+        <div class="pro-acc-section-card">
+            <div class="pro-acc-sec-title">
+                <span class="sec-title-icon">👤</span>
+                <span>Profile</span>
+            </div>
+
+            <div class="pro-acc-profile-row">
+                <!-- 1. AVATAR -->
+                <div class="pro-avatar-ring-wrap" onclick="document.getElementById('dpFileInput').click()" title="Change Profile Picture">
+                    <img id="modalAvatarImg" src="images/My Account Icon.webp" alt="Avatar">
+                </div>
+
+                <!-- 2. NAME & CHANGE DP (WAPAS RESTORE KIYA) -->
+                <div class="pro-profile-center-info">
+                    <div class="pro-user-name-line">
+                        <input type="text" id="customerNameInput" class="pro-name-input-field" 
+                               value="Rocco Creator" maxlength="20" placeholder="Enter name..." 
+                               onblur="saveCustomerName()" onkeydown="if(event.key==='Enter') this.blur();">
+                        <span class="pro-name-edit-pen" onclick="document.getElementById('customerNameInput').focus()">✏️</span>
+                    </div>
+                    <span class="pro-member-since-text" id="lblMemberSince">Creator Edition &bull; Master Toolkits</span>
+                    
+                    <button type="button" class="btn-pro-change-dp" onclick="document.getElementById('dpFileInput').click()">
+                        📷 Change DP
+                    </button>
+                    <input type="file" id="dpFileInput" accept="image/*" style="display:none;" onchange="handleDPUpload(event)">
+                </div>
+
+                <!-- 3. 👑 REAL LIVE LICENSE BADGE (RIGHT SIDE) -->
+                <div class="pro-profile-license-slot">
+                    <div class="pro-license-badge">
+                        <div class="badge-crown-icon">👑</div>
+                        <div class="badge-info-col">
+                            <div class="badge-tier-title">
+                                <span id="modalHdrPlanTitle">Free Trial Active</span>
+                                <span class="pulse-status-dot"></span>
+                            </div>
+                            <div class="badge-devices-text" id="modalHdrDeviceText">1 Device &bull; 11 Days</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- THEME DIVIDER LINE -->
+            <div class="pro-acc-divider"></div>
+
+            <!-- THEME DOTS ROW (ALAG SE NEECHE RAHEGA) -->
+            <div class="pro-acc-theme-row">
+                <div class="pro-theme-label">
+                    <span class="theme-palette-icon">🎨</span>
+                    <span>Theme Accent Color</span>
+                </div>
+                <div class="theme-dots-row">
+                    <div class="theme-dot dot-navy active" title="Cyber Navy" onclick="changeTheme('theme-navy', this)"></div>
+                    <div class="theme-dot dot-light" title="Studio White + Blue" onclick="changeTheme('theme-light', this)"></div>
+                    <div class="theme-dot dot-pink" title="Neon Pink" onclick="changeTheme('theme-pink', this)"></div>
+                    <div class="theme-dot dot-purple" title="Obsidian Purple" onclick="changeTheme('theme-purple', this)"></div>
+                    <div class="theme-dot dot-animate" title="Classic Animate" onclick="changeTheme('theme-animate', this)"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= CARD: ACCOUNT SECURITY (PERMANENT REGISTERED IDENTITY) ================= -->
+<div class="pro-acc-section-card">
+    <div class="pro-acc-sec-title">
+        <span class="sec-title-icon">🛡️</span>
+        <span>Account Security</span>
+    </div>
+
+    <div class="ty-acc-security-box">
+        <div class="sec-box-left">
+            <div class="sec-mail-badge-icon">✉️</div>
+            <div class="sec-mail-details">
+                <span class="sec-mail-label">REGISTERED ACCOUNT EMAIL</span>
+                <span class="sec-mail-address" id="lblRegisterEmailDisplay" style="color: #38bdf8;">animator@rocco.studio</span>
+                <small id="lblTrialExpiryDetails" class="sec-mail-subtext" style="display: none;"></small>
+            </div>
+        </div>
+        <div class="sec-box-right">
+            <span id="badgeDeviceBinding" class="badge-device-bound">
+                <span id="lblBindingIcon">🔒</span>
+                <span id="lblBindingText">Device Bound</span>
+            </span>
+        </div>
+    </div>
+    <!-- Dynamic Security Actions (Sign In / Check Status / Sign Out) -->
+    <div id="slotAccountSecurityAction" style="margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap;"></div>
+</div>
+
+        
+        <!-- ================= CARD: AI SERVICES & API KEY ================= -->
+        <div class="pro-acc-section-card" style="display: none !important;">
+            <div class="pro-acc-sec-title" style="justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="sec-title-icon">🤖</span>
+                    <span>AI Services &amp; OpenAI API Key</span>
+                </div>
+                <span class="license-status-badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border-color: rgba(16, 185, 129, 0.3);">CONNECTED ⚡</span>
+            </div>
+            <p style="font-size: 8.5px; color: var(--text-muted, #94a3b8); margin-bottom: 8px; line-height: 1.4;">
+                Powers AI Lip-Sync, Phoneme Recognition, and Vector Gap Healer. Key is saved locally on this machine.
+            </p>
+            <div class="license-key-box" style="margin-bottom: 8px;">
+                <div class="key-field-label">ACTIVE OPENAI / WHISPER API KEY</div>
+                <div class="key-display-row">
+                    <input type="password" id="txtAccountAiApiKey" style="flex: 1; background: transparent; border: none; color: #38bdf8; font-family: monospace; font-size: 11px; outline: none;" autocomplete="off">
+                    <button type="button" class="btn-copy-key" onclick="toggleAccountAiKeyEye(this)" title="Show/Hide Key">
+                        <span>👁️</span>
+                    </button>
+                    <button type="button" class="btn-copy-key" onclick="saveAccountAiApiKey()" title="Save Key">
+                        <span>💾 Save</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= CARD 2: SUBSCRIPTION STATUS (ALAG SEPARATE CARD) ================= -->
+        <div class="pro-acc-section-card">
+            <div class="pro-acc-sec-title" style="justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="sec-title-icon">👑</span>
+                    <span>Subscription Status</span>
+                </div>
+                <span class="license-status-badge" id="accLicenseStatusBadge">ACTIVE</span>
+            </div>
+
+            <!-- Plan Name & Days Pill -->
+            <div class="license-plan-row">
+                <div class="license-plan-info">
+                    <div class="license-plan-name" id="accLicensePlanName">Studio Plan</div>
+                    <div class="license-device-count" id="accLicenseDevicesText">1/4 Devices Authorized</div>
+                </div>
+                <div class="license-days-pill" id="accLicenseDaysPill">-- Days Left</div>
+            </div>
+
+            <!-- Masked License Key Box -->
+            <div class="license-key-box">
+                <div class="key-field-label">ASSIGNED LICENSE KEY</div>
+                <div class="key-display-row">
+                    <div class="masked-key-text" id="accMaskedKeyDisplay">ROC-••••-••••-••••</div>
+                    <button type="button" class="btn-copy-key" id="btnCopyKey" onclick="copyAssignedLicenseKey()" title="Copy License Key">
+                        <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        <span id="lblCopyBtnText">Copy</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Renew / Upgrade Button -->
+            <button type="button" class="btn-pro-theme-action" onclick="roccoRenewSubscription()">
+                ⚡ Renew / Upgrade Subscription
+            </button>
+        </div>
+
+        <!-- CARD 3: VIDEO MASTERCLASSES -->
+        <div class="pro-acc-section-card" style="padding: 10px 14px; cursor: pointer;" onclick="openExternalLink('https://www.youtube.com/@Raceducaterofficial')" title="Watch Official Toolkits Masterclasses">
+            <div class="tutorials-left-col" style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div class="tutorials-play-circle">
+                        <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor">
+                            <polygon points="6 4 20 12 6 20 6 4"></polygon>
+                        </svg>
+                    </div>
+                    <div class="tutorials-info-wrap">
+                        <div class="tutorials-title-row">
+                            <span class="tutorials-title">WATCH TUTORIAL</span>
+                            <span class="tutorials-badge">FULL HD</span>
+                        </div>
+                        <span class="tutorials-desc">Master Rigging, Locomotion &amp; Timeline FX</span>
+                    </div>
+                </div>
+                <span class="assist-tile-arrow" style="font-size: 16px; color: var(--text-muted, #94a3b8);">›</span>
+            </div>
+        </div>
+
+        <!-- CARD 4: ASSISTANCE & SUPPORT -->
+        <div class="pro-acc-section-card">
+            <div class="pro-acc-sec-title">
+                <span class="sec-title-icon">🎧</span>
+                <span>Assistance</span>
+            </div>
+            <p class="pro-assist-subtext">Need help? We're here for you.</p>
+
+            <div class="pro-support-grid-row">
+                <button type="button" class="btn-pro-assist-tile btn-wa-tile" onclick="openWhatsApp()">
+                    <div class="assist-tile-left">
+                        <img src="images/WhatsApp Icon in Color.svg" class="assist-tile-svg" alt="WA" onerror="this.innerHTML='💬'">
+                        <div class="assist-tile-text">
+                            <strong>WhatsApp Support</strong>
+                            <small>+923464056113</small>
+                        </div>
+                    </div>
+                    <span class="assist-tile-arrow">›</span>
+                </button>
+
+                <button type="button" class="btn-pro-assist-tile btn-mail-tile" onclick="openEmail()">
+                    <div class="assist-tile-left">
+                        <img src="images/Email Circle Icon Color.svg" class="assist-tile-svg" alt="Mail" onerror="this.innerHTML='✉️'">
+                        <div class="assist-tile-text">
+                            <strong>Email Desk</strong>
+                            <small>help@expeazzy.com</small>
+                        </div>
+                    </div>
+                    <span class="assist-tile-arrow">›</span>
+                </button>
+            </div>
+
+            <!-- License Key Transfer Action Button -->
+            <button type="button" class="btn-pro-key-transfer" onclick="roccoRequestKeyTransfer()">
+                <span style="display:flex; align-items:center; gap:8px;">
+                    <span style="font-size:13px;">📩</span>
+                    <span>Request Key Transfer</span>
+                </span>
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<!-- ================= 1. SLEEK TOP SUCCESS NOTIFICATION (TOP POPUP) ================= -->
+<div id="topSuccessToast" class="top-success-toast" style="display: none;">
+    <div class="toast-left-icon">
+        <div class="toast-check-circle">✓</div>
+    </div>
+    <div class="toast-center-info">
+        <div class="toast-title">TRANSFER APPEAL RECEIVED</div>
+        <div class="toast-desc">Delivered to <b>Rocco Manager</b>. Seat will be reset shortly.</div>
+        <div class="toast-status-tag">Status: <b>⏳ Pending Admin Approval</b></div>
+    </div>
+    <button class="toast-close-btn" onclick="closeSuccessToast()">✕</button>
+</div>
+
+<!-- ============================================================================
+     🚀 1:1 REFERENCE: ULTRA-PRO MANAGE LICENSE TRANSFER MODAL
+     ============================================================================ -->
+<div id="transferModalOverlay" class="ty-transfer-ref-overlay" style="display: none;" onclick="closeTransferModal(event)">
+    <div class="ty-transfer-ref-card" onclick="event.stopPropagation()">
+        
+        <!-- ✕ TOP CLOSE BUTTON -->
+        <button type="button" class="btn-ref-modal-close" onclick="closeTransferModal()" title="Close">✕</button>
+
+        <!-- 1. TOP BRANDING BAR -->
+        <div class="ref-top-brand-bar">
+            <div class="ref-logo-group">
+    <div class="ref-brand-text">
+        <span class="ref-brand-name">Rocco <span class="ref-brand-accent">by Raceducater</span></span>
+        <span class="ref-brand-sub">STUDIO TOOLKITS</span>
+    </div>
+</div>
+            <div class="ref-slogan-line">
+                <span>Animate Faster</span>
+                <span class="ref-slogan-dot">•</span>
+                <span>Create Better</span>
+            </div>
+        </div>
+
+        <!-- 2. MAIN HEADER (ICON + TITLE + LIVE STATUS) -->
+        <div class="ref-modal-header-row">
+            <div class="ref-header-left">
+                <div class="ref-header-icon-box" style="background: transparent; border: none; box-shadow: none;">
+    <img src="images/transfer-icon.png" alt="Transfer" style="width: 44px; height: 44px; object-fit: contain; border-radius: 12px;">
+</div>
+                <div class="ref-header-meta">
+                    <span class="ref-meta-tag">LICENSE MANAGEMENT</span>
+                    <h2 class="ref-main-title">Manage License Transfer</h2>
+                    <p class="ref-sub-title">Deactivate this device to use your license on another machine.</p>
+                </div>
+            </div>
+
+            <div class="ref-header-status-pill">
+                <span class="ref-status-pulse-dot"></span>
+                <div class="ref-status-text-col">
+                    <small>Current Status</small>
+                    <b id="refLiveStatusText">Active on 1/1 Devices</b>
+                </div>
+                <span class="ref-status-arrow">›</span>
+            </div>
+        </div>
+
+        <!-- 3. TWO-COLUMN WORKSPACE -->
+        <div class="ref-transfer-body-grid">
+            
+            <!-- LEFT COLUMN: SYSTEM DATA & CONFIRMATION -->
+            <div class="ref-left-col">
+                
+                <!-- CARD 1: CURRENT MACHINE INFO -->
+                <div class="ref-card-box ref-machine-info-card">
+                    <div class="ref-machine-icon-wrap">
+                        <img src="images/single-pc-icon.png" class="ref-single-pc-img" alt="PC" onerror="this.outerHTML='<div class=\'ref-fallback-pc-icon\'>🖥️</div>'">
+                    </div>
+                    <div class="ref-machine-details-list">
+                        <h4 class="ref-box-heading">Current Machine Information</h4>
+                        
+                        <div class="ref-spec-row">
+                            <span class="ref-spec-icon">🖲️</span>
+                            <span class="ref-spec-label">Machine ID</span>
+                            <span class="ref-spec-colon">:</span>
+                            <span class="ref-spec-val" id="refMachineIdVal">Fetching...</span>
+                            <button type="button" class="btn-ref-copy" onclick="copyMachineIdRef(this)" title="Copy Machine ID">
+                                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div class="ref-spec-row">
+                            <span class="ref-spec-icon">💻</span>
+                            <span class="ref-spec-label">Device Name</span>
+                            <span class="ref-spec-colon">:</span>
+                            <span class="ref-spec-val" id="refDeviceNameVal">HARSH-PC</span>
+                        </div>
+
+                        <div class="ref-spec-row">
+                            <span class="ref-spec-icon">🪟</span>
+                            <span class="ref-spec-label">Operating System</span>
+                            <span class="ref-spec-colon">:</span>
+                            <span class="ref-spec-val" id="refOsVal">Windows 10/11 (64-bit)</span>
+                        </div>
+
+                        <div class="ref-spec-row">
+                            <span class="ref-spec-icon-an">An</span>
+                            <span class="ref-spec-label">Adobe Animate</span>
+                            <span class="ref-spec-colon">:</span>
+                            <span class="ref-spec-val" id="refAnimateVerVal">2024 (v24.0)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CARD 2: DESCRIPTION (OPTIONAL) -->
+                <div class="ref-card-box ref-desc-card">
+                    <div class="ref-desc-head">
+                        <div class="ref-desc-title-group">
+                            <span class="ref-note-icon">📝</span>
+                            <div>
+                                <strong>Description <span class="ref-opt-tag">(Optional)</span></strong>
+                                <small>Add a short note (e.g. why you are transferring, new device name, etc.)</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ref-textarea-wrap">
+                        <textarea id="refTransferReason" maxlength="200" placeholder="Enter description here..." oninput="handleRefReasonCount(this)"></textarea>
+                        <span class="ref-char-counter" id="refCharCounter">0/200</span>
+                    </div>
+                </div>
+
+                <!-- CARD 3: IMPORTANT INFORMATION WARNING -->
+                <div class="ref-alert-warning-box">
+                    <div class="ref-warning-triangle">⚠️</div>
+                    <div class="ref-warning-content">
+                        <strong>Important Information</strong>
+                        <p>Once you confirm, this device will be deactivated and you will be able to register your license key on a new system. You can reactivate on this device anytime using your license key.</p>
+                    </div>
+                </div>
+
+                <!-- CARD 4: CONFIRM YOUR LICENSE -->
+                <div class="ref-card-box ref-confirm-key-card">
+                    <div class="ref-confirm-head">
+                        <div class="ref-lock-badge">🔒</div>
+                        <div class="ref-confirm-text">
+                            <strong>Confirm Your License</strong>
+                            <small>Please enter your License Key or account password to continue.</small>
+                        </div>
+                    </div>
+
+                    <div class="ref-confirm-input-wrap">
+                        <span class="ref-key-icon">🔑</span>
+                        <input type="password" id="refConfirmKeyInput" placeholder="Enter License Key (e.g. TY-XXXX-XXXX)" autocomplete="off">
+                        <button type="button" class="btn-ref-toggle-eye" onclick="toggleRefKeyEye()" title="Show/Hide Key">
+                            <svg id="refEyeOpen" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                            <svg id="refEyeClosed" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" style="display:none;">
+                                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                <line x1="1" y1="1" x2="23" y2="23"></line>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div class="ref-secure-line">
+                        <span class="ref-shield-tick">🛡️</span>
+                        <span>This action is secure and encrypted.</span>
+                    </div>
+
+                    <div id="refTransferStatusMsg" class="ref-feedback-status"></div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN: PROMOTIONAL / FEATURE CARDS -->
+            <div class="ref-right-col">
+                <div class="ref-feature-banner-box">
+                    <div class="ref-double-pc-wrap">
+                        <img src="images/double-pc-icon.png" class="ref-double-pc-img" alt="Transfer illustration" onerror="this.outerHTML='<div class=\'ref-fallback-double-icon\'>💻 ⇄ 💻</div>'">
+                    </div>
+
+                    <h3 class="ref-feature-title">Transfer Your License <br><span class="ref-feature-highlight">With Ease</span></h3>
+                    <p class="ref-feature-sub">Deactivate this device and use your license on another machine. Flexible, secure and hassle-free.</p>
+
+                    <!-- 4 FEATURE TILES -->
+                    <div class="ref-benefits-list">
+                        <div class="ref-benefit-item">
+                            <div class="benefit-icon-circle">🛡️</div>
+                            <div class="benefit-text">
+                                <strong>100% Secure</strong>
+                                <span>Your license data is fully protected.</span>
+                            </div>
+                        </div>
+
+                        <div class="ref-benefit-item">
+                            <div class="benefit-icon-circle">💻</div>
+                            <div class="benefit-text">
+                                <strong>Use on Another Device</strong>
+                                <span>Register on a new system anytime.</span>
+                            </div>
+                        </div>
+
+                        <div class="ref-benefit-item">
+                            <div class="benefit-icon-circle">🔄</div>
+                            <div class="benefit-text">
+                                <strong>Reactivate Anytime</strong>
+                                <span>You can reactivate on this device later.</span>
+                            </div>
+                        </div>
+
+                        <div class="ref-benefit-item">
+                            <div class="benefit-icon-circle">📋</div>
+                            <div class="benefit-text">
+                                <strong>Keep a Note</strong>
+                                <span>Add a description for easy tracking.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 4. BOTTOM ACTION & SUPPORT FOOTER -->
+        <div class="ref-modal-footer">
+            <div class="ref-footer-left">
+                <div class="ref-help-meta">
+                    <span class="ref-help-icon">❓</span>
+                    <div class="ref-help-texts">
+                        <strong>Need Help?</strong>
+                        <small>Here are some helpful resources.</small>
+                    </div>
+                </div>
+
+                <div class="ref-footer-links">
+                    <button type="button" class="btn-ref-link" onclick="openVideoTutorials()">
+                        <span class="ref-play-icon">▶</span>
+                        <span>Watch Tutorial</span>
+                    </button>
+                    <button type="button" class="btn-ref-link" onclick="openExternalLink('https://raceducater.com/docs/')">
+                        <span>📄</span>
+                        <span>Read Documentation</span>
+                    </button>
+                    <button type="button" class="btn-ref-link" onclick="openWhatsApp()">
+                        <span>🎧</span>
+                        <span>Contact Support</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="ref-footer-actions">
+                <button type="button" class="btn-ref-cancel" onclick="closeTransferModal()">Cancel</button>
+                <button type="button" id="btnRefDeactivateSubmit" class="btn-ref-submit-transfer" onclick="executeReferenceDeactivateTransfer()">
+                    <span class="ref-btn-arrows">⇄</span>
+                    <span id="lblRefTransferBtnText">Deactivate &amp; Transfer</span>
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ============================================================================
+     👑 14-DAY FREE TRIAL AUTHENTICATION & REGISTRATION MODAL (DUAL-VIEW)
+     ============================================================================ -->
+<div id="trialAuthModalOverlay" class="ty-modal-overlay" style="display: none;">
+    <div class="ty-trial-auth-card">
+        
+        <!-- CLOSE BUTTON -->
+        <button type="button" class="btn-trial-close" onclick="closeTrialAuthModal(event)" style="z-index: 99999 !important; cursor: pointer !important;" title="Close">✕</button>
+
+        <!-- ================= VIEW 1: LOGIN & START TRIAL ================= -->
+        <div id="trialLoginView" class="trial-view-container">
+            <div class="trial-modal-header">
+                <div class="trial-modal-tag">
+                    <span class="tag-crown">👑</span>
+                    <span>OFFICIAL TRIAL ACTIVATION</span>
+                </div>
+                <h2 class="trial-modal-title">Unlock 14 Days Free Trial</h2>
+                <p class="trial-modal-sub">Login with your Rocco account to bind this 14-day pass to your computer.</p>
+            </div>
+
+            <div class="trial-modal-body">
+                <div class="ty-auth-field">
+                    <label class="ty-auth-label">REGISTERED ACCOUNT EMAIL</label>
+                    <div class="ty-auth-input-box">
+                        <svg class="auth-input-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                        <input type="email" id="trialUserEmail" placeholder="yourname@gmail.com" autocomplete="email">
+                    </div>
+                </div>
+
+                <div class="ty-auth-field">
+                    <label class="ty-auth-label">PASSWORD</label>
+                    <div class="ty-auth-input-box">
+                        <svg class="auth-input-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <input type="password" id="trialUserPass" placeholder="Enter your password" autocomplete="current-password" onkeydown="if(event.key==='Enter') executeTrialLoginAndStart();">
+                        <button type="button" class="btn-toggle-eye" onclick="toggleTrialPasswordVisibility('trialUserPass', this)" title="Show/Hide Password">
+                            👁️
+                        </button>
+                    </div>
+                </div>
+
+                <div class="trial-hwid-bar">
+                    <div class="hwid-meta-left">
+                        <span class="hwid-dot"></span>
+                        <span class="hwid-label">DEVICE HWID LOCK:</span>
+                    </div>
+                    <span class="hwid-val trialDisplayHwidText">ROC-PC-••••••••</span>
+                </div>
+
+                <div id="trialModalFeedback" class="trial-feedback-box" style="display: none;"></div>
+
+                <button type="button" id="btnSubmitTrialAuth" class="btn-trial-activate-pro" onclick="executeTrialLoginAndStart()">
+                    <span class="btn-text">⚡ Authenticate &amp; Start Trial</span>
+                </button>
+            </div>
+
+            <div class="trial-modal-footer">
+                <div class="trial-footer-info">
+                    <b class="footer-title">Don't have a Rocco Account?</b>
+                    <span class="footer-sub">Sign up takes 20 seconds.</span>
+                </div>
+                <button type="button" class="btn-go-register" onclick="switchTrialModalView('register')">
+                    <span>Create Account</span>
+                    <span class="arrow-up-right">→</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= VIEW 2: IN-APP INSTANT REGISTRATION ================= -->
+        <div id="trialRegisterView" class="trial-view-container" style="display: none;">
+            <div class="trial-modal-header">
+                <div class="trial-modal-tag" style="color: #38bdf8;">
+                    <span>✨ FAST REGISTRATION</span>
+                </div>
+                <h2 class="trial-modal-title">Create Rocco Account</h2>
+                <p class="trial-modal-sub">Create your official account. It will activate on Raceducater.com instantly.</p>
+            </div>
+
+            <div class="trial-modal-body">
+                <div class="ty-auth-field">
+                    <label class="ty-auth-label">YOUR FULL NAME</label>
+                    <div class="ty-auth-input-box">
+                        <svg class="auth-input-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        <input type="text" id="legacyTrialFullName" placeholder="e.g. Rahul Sharma" autocomplete="name">
+                    </div>
+                </div>
+
+                <div class="ty-auth-field">
+                    <label class="ty-auth-label">EMAIL ADDRESS</label>
+                    <div class="ty-auth-input-box">
+                        <svg class="auth-input-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                        <input type="email" id="legacyTrialRegEmail" placeholder="yourname@gmail.com" autocomplete="email">
+                    </div>
+                </div>
+
+                <div class="ty-auth-field">
+                    <label class="ty-auth-label">CHOOSE A PASSWORD</label>
+                    <div class="ty-auth-input-box">
+                        <svg class="auth-input-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <input type="password" id="legacyTrialRegPass" placeholder="Min. 6 characters" autocomplete="new-password" onkeydown="if(event.key==='Enter') executeTrialRegisterAndStart();">
+                        <button type="button" class="btn-toggle-eye" onclick="toggleTrialPasswordVisibility('regPass', this)" title="Show/Hide Password">
+                            👁️
+                        </button>
+                    </div>
+                </div>
+
+                <div class="trial-hwid-bar">
+                    <div class="hwid-meta-left">
+                        <span class="hwid-dot"></span>
+                        <span class="hwid-label">DEVICE HWID LOCK:</span>
+                    </div>
+                    <span class="hwid-val trialDisplayHwidText">ROC-PC-••••••••</span>
+                </div>
+
+                <div id="regModalFeedback" class="trial-feedback-box" style="display: none;"></div>
+
+                <button type="button" id="btnSubmitTrialRegister" class="btn-trial-activate-pro" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;" onclick="executeTrialRegisterAndStart()">
+                    <span class="btn-text">🚀 Create Account &amp; Start Trial</span>
+                </button>
+            </div>
+
+            <div class="trial-modal-footer">
+                <div class="trial-footer-info">
+                    <b class="footer-title">Already have an Account?</b>
+                    <span class="footer-sub">Sign in with your password.</span>
+                </div>
+                <button type="button" class="btn-go-register" onclick="switchTrialModalView('login')">
+                    <span>← Back to Login</span>
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ================= ⚠️ CUSTOM DISCONNECT CONFIRM MODAL ================= -->
+<div id="disconnectConfirmModal" class="ty-modal-overlay" style="display: none; z-index: 20000000 !important;">
+    <div class="ty-trial-auth-card" style="max-width: 310px; text-align: center; padding: 22px 18px;">
+        <div class="disc-icon-circle">⚠️</div>
+        <h3 class="disc-title">Disconnect Account?</h3>
+        <p class="disc-sub">Are you sure you want to unlink <b id="discTargetEmailText" style="color: #ef4444;"></b>? You can connect another account after disconnecting.</p>
+        
+        <div class="disc-action-row">
+            <button type="button" class="btn-disc-cancel" onclick="closeDisconnectModal()">Cancel</button>
+            <button type="button" class="btn-disc-confirm" onclick="confirmActualDisconnect()">Disconnect</button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================================
+     🗣️ ROCCO STUDIO 100% ACCURATE VISEME AUTO LIP-SYNC MODAL
+     ============================================================================ -->
+<div id="tyLipSyncModal" class="ty-modal-overlay" style="display: none;">
+    <div class="ty-trial-auth-card" style="max-width: 460px; text-align: left; padding: 18px 20px;">
+        
+        <!-- Header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 20px;">🗣️</span>
+                <strong style="font-size: 14px; color: var(--border-accent, #00d2ff);">Auto Lip-Sync &amp; Viseme Mapper</strong>
+            </div>
+            <button type="button" class="btn-trial-close" onclick="closeLipSyncModal()">✕</button>
+        </div>
+
+        <!-- 1. Audio File Picker -->
+        <div class="ty-auth-field" style="margin-bottom: 10px;">
+            <label class="ty-auth-label">SELECT DIALOGUE AUDIO (.WAV / .MP3)</label>
+            <div style="display: flex; gap: 6px;">
+                <div class="ty-auth-input-box" style="flex: 1; height: 32px;">
+                    <input type="text" id="txtLipSyncAudioPath" placeholder="Choose dialogue audio..." readonly>
+                </div>
+                <button type="button" class="btn-lipsync-browse" onclick="browseLipSyncAudio()">
+    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+    </svg>
+    <span>Browse</span>
+</button>
+            </div>
+        </div>
+
+        
+        <!-- OpenAI Whisper AI Key (Auto-Loaded & Hidden from UI) -->
+        <div class="ty-auth-field" style="display: none !important; margin-bottom: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
+                <label class="ty-auth-label" style="margin-bottom: 0;">OPENAI WHISPER API KEY</label>
+                <span style="font-size: 7.5px; color: #10b981; font-weight: 700;">⚡ AUTO-CONNECTED</span>
+            </div>
+            <div class="ty-auth-input-box" style="height: 30px;">
+                <input type="password" id="txtWhisperApiKey" placeholder="sk-proj-..." autocomplete="off">
+            </div>
+        </div>
+
+        <!-- 2. COLLAPSIBLE VISEME SETUP ACCORDION (Default Hidden) -->
+        <div class="viseme-accordion-wrapper">
+            
+            <!-- Clickable Dropdown Header -->
+            <div class="viseme-accordion-header" onclick="toggleVisemeAccordion()">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <span style="font-size: 11px;">⚙️</span>
+                    <span style="font-size: 9px; font-weight: 800; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.4px;">
+                        Custom Mouth Frames Setup (Visemes)
+                    </span>
+                    <span id="lblActivePresetBadge" class="viseme-badge-tag">7-Frame</span>
+                </div>
+                <span id="arrowVisemeAccordion" class="viseme-accordion-arrow">▼</span>
+            </div>
+
+            <!-- Dropdown Body (Default Hidden) -->
+            <div id="visemeAccordionBody" class="viseme-accordion-body" style="display: none;">
+                
+                <!-- Presets Bar -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,0.06);">
+                    <small style="font-size: 7.5px; color: var(--text-muted, #94a3b8); font-weight: 600;">Match with your symbol drawings:</small>
+                    <div style="display: flex; gap: 4px;">
+                        <button type="button" class="btn-viseme-preset active" id="preset7" onclick="applyVisemePreset('7frame', this)">7-Frame</button>
+                        <button type="button" class="btn-viseme-preset" id="preset5" onclick="applyVisemePreset('5frame', this)">5-Frame</button>
+                        <button type="button" class="btn-viseme-preset" id="preset12" onclick="applyVisemePreset('12frame', this)">12-Frame</button>
+                    </div>
+                </div>
+
+                <!-- Viseme Mapping Slots (Grid) -->
+                <div class="viseme-grid-container">
+                    <div class="viseme-card">
+                        <span class="v-label">Neutral / M</span>
+                        <small class="v-desc">Band (Silence)</small>
+                        <input type="number" id="v_neutral" class="v-input" value="1" min="1" max="50">
+                    </div>
+
+                    <div class="viseme-card">
+                        <span class="v-label">Ah / AA</span>
+                        <small class="v-desc">Bada Khula</small>
+                        <input type="number" id="v_ah" class="v-input" value="2" min="1" max="50">
+                    </div>
+
+                    <div class="viseme-card">
+                        <span class="v-label">D / Talk</span>
+                        <small class="v-desc">Normal Baat</small>
+                        <input type="number" id="v_talk" class="v-input" value="4" min="1" max="50">
+                    </div>
+
+                    <div class="viseme-card">
+                        <span class="v-label">Ee / S, T</span>
+                        <small class="v-desc">Daant Mile</small>
+                        <input type="number" id="v_ee" class="v-input" value="5" min="1" max="50">
+                    </div>
+
+                    <div class="viseme-card">
+                        <span class="v-label">F / V</span>
+                        <small class="v-desc">Daant Honth Par</small>
+                        <input type="number" id="v_f" class="v-input" value="6" min="1" max="50">
+                    </div>
+
+                    <div class="viseme-card">
+                        <span class="v-label">L / TH</span>
+                        <small class="v-desc">Jeebh Upar</small>
+                        <input type="number" id="v_l" class="v-input" value="3" min="1" max="50">
+                    </div>
+
+                    <div class="viseme-card">
+                        <span class="v-label">Oh / W-Oo</span>
+                        <small class="v-desc">Gol Circle</small>
+                        <input type="number" id="v_oh" class="v-input" value="7" min="1" max="50">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+	<!-- ⏱️ NEW: SURGICAL AUDIO SLICER SLOTS -->
+        <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+            <!-- 1. Audio In-Point / Start Time -->
+            <div class="ty-auth-field" style="flex: 1; margin-bottom: 0;">
+                <label class="ty-auth-label">AUDIO START (MM:SS)</label>
+                <div class="ty-auth-input-box" style="height: 30px;">
+                    <input type="text" id="txtAudioStartTime" value="00:00" placeholder="03:00 (for 3 min)" style="font-family: monospace; font-size: 11px;">
+                </div>
+            </div>
+
+            <!-- 2. Clip Duration -->
+            <div class="ty-auth-field" style="flex: 1; margin-bottom: 0;">
+                <label class="ty-auth-label">CLIP DURATION</label>
+                <div class="ty-auth-input-box" style="height: 30px;">
+                    <input type="text" id="txtAudioDuration" value="Auto" placeholder="Auto or 00:10" style="font-family: monospace; font-size: 11px;">
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Timeline Start Frame Offset -->
+        <div class="ty-auth-field" style="margin-bottom: 12px;">
+            <label class="ty-auth-label">TIMELINE START FRAME OFFSET</label>
+            <div class="ty-auth-input-box" style="height: 30px;">
+                <input type="number" id="numLipSyncStartFrame" value="1" min="1" style="font-family: monospace;">
+            </div>
+        </div>
+
+        <!-- 4. Progress Container -->
+        <div id="lipSyncProgressWrap" style="display: none; margin-bottom: 10px;">
+            <div style="display: flex; justify-content: space-between; font-size: 8.5px; margin-bottom: 4px; color: var(--text-title, #fff);">
+                <span id="lblLipSyncStatus">Processing...</span>
+                <span id="lblLipSyncPercent">0%</span>
+            </div>
+            <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
+                <div id="barLipSyncProgress" style="width: 0%; height: 100%; background: linear-gradient(90deg, #00d2ff, #10b981); transition: width 0.2s ease;"></div>
+            </div>
+        </div>
+
+        <div id="lipSyncFeedback" style="display: none; font-size: 9px; font-weight: 700; text-align: center; margin-bottom: 10px;"></div>
+
+        <!-- 5. Action Button -->
+        <button type="button" id="btnExecuteLipSync" class="btn-trial-activate-pro" style="width: 100%; padding: 10px 0;" onclick="startLipSyncProcess()">
+            ⚡ Generate Auto Lip-Sync
+        </button>
+    </div>
+</div>
+
+</body>
+</html>

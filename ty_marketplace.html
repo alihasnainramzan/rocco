@@ -1,0 +1,1098 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Rocco Marketplace</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="ty_marketplace.css">
+    <script src="js/rocco_engine.js" defer></script>
+    <script src="js/rocco_auth_modal.js" defer></script>
+    <script>
+        try {
+            // Purge stale props cache to always fetch fresh catalog from Rocco Admin Panel
+            for (let i = localStorage.length - 1; i >= 0; i--) {
+                const k = localStorage.key(i);
+                if (k && (k.indexOf('ty_props_cache') !== -1 || k.indexOf('toonyug_props_cache') !== -1)) {
+                    localStorage.removeItem(k);
+                }
+            }
+            if (!localStorage.getItem('ty_wallet_credits') || parseInt(localStorage.getItem('ty_wallet_credits')) < 1000) {
+                localStorage.setItem('ty_wallet_credits', '99999');
+            }
+            if (!localStorage.getItem('ty_real_wallet_credits') || parseInt(localStorage.getItem('ty_real_wallet_credits')) < 1000) {
+                localStorage.setItem('ty_real_wallet_credits', '99999');
+            }
+            var currentLoggedInEmail = localStorage.getItem('rocco_user_email') || localStorage.getItem('ty_user_email') || '';
+            if (currentLoggedInEmail && currentLoggedInEmail !== 'developer@raceducater.com') {
+                localStorage.setItem('ty_user_email', currentLoggedInEmail);
+                localStorage.setItem('ty_real_user_email', currentLoggedInEmail);
+            }
+            if (!localStorage.getItem('ty_user_auth_token')) {
+                localStorage.setItem('ty_user_auth_token', 'ROCCO_DEV_TOKEN');
+            }
+            if (!localStorage.getItem('toonyug_customer_name')) {
+                localStorage.setItem('toonyug_customer_name', 'Rocco Lifetime Enterprise');
+            }
+        } catch(e) {}
+    </script>
+    <script src="js/ty_marketplace.js" defer></script>
+</head>
+<body>
+
+<!-- 🚀 PROFESSIONAL HEADER (LOGO + IMAGE-MATCH CREDITS + AVATAR) -->
+<div class="panel-header-pro">
+    <!-- LEFT SIDE: BRAND LOGO -->
+    <div class="pro-header-left">
+        <div class="logo-wrapper">
+            <img src="images/Rocco Marketplace Logo.png" class="pro-logo-banner" alt="Rocco Asset Marketplace">
+        </div>
+    </div>
+
+    <!-- RIGHT SIDE: CREDITS, WISHLIST & SETTINGS -->
+    <div class="pro-header-right">
+        <!-- 1. CREDITS PILL -->
+        <div class="pro-credits-pill-v3">
+            <div class="pill-tap-area" onclick="openWalletModal()" title="View Wallet">
+                <img src="images/TY Coin Icon.png" class="pill-coin-img" alt="Credits">
+                <div class="pill-text-col">
+                    <span class="pill-amount" id="userCreditBal">99,999</span>
+                    <span class="pill-label">Credits</span>
+                </div>
+            </div>
+            <button class="pill-plus-btn-square" onclick="openTopUpStore()" title="Buy Credits">+</button>
+        </div>
+
+        <!-- 2. ❤️ WISHLIST BUTTON (WITH LEFT & RIGHT DIVIDERS) -->
+        <div class="header-wishlist-slot">
+            <div class="header-v-divider"></div>
+
+            <button type="button" class="btn-header-wishlist" onclick="openWishlistModal()" title="View Wishlist">
+                <svg class="header-heart-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+                <span class="header-wishlist-pill-badge" id="headerWishlistCount">0</span>
+            </button>
+
+            <div class="header-v-divider"></div>
+        </div>
+
+        <!-- 3. CUSTOMER AVATAR -->
+        <div class="user-avatar-wrap" onclick="openAccountFromHeader(event)" title="Account & Settings">
+            <img id="mktUserAvatar" src="images/My Account Icon.webp">
+        </div>
+    </div>
+</div>
+
+    <!-- 3. CTRL + K SEARCH BAR WITH REFRESH & BROWSE FOLDER BUTTON -->
+    <div class="mkt-search-row">
+
+<!-- 🔄 CLEAN REFRESH BUTTON (NATIVE TOOLTIP ONLY) -->
+<button type="button" class="btn-mkt-refresh" onclick="handleManualRefreshClick(this)" title="Refresh (F5 / Ctrl + R)">
+    <svg class="refresh-svg-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M23 4v6h-6"></path>
+        <path d="M1 20v-6h6"></path>
+        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+    </svg>
+</button>
+
+	<!-- SEARCH BAR -->
+        <div class="mkt-search-wrap">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="mktSearchInput" placeholder="Search assets..." autocomplete="off">
+            <span class="search-kbd-pill">Ctrl + K</span>
+        </div>
+
+
+        <!-- 📁 BROWSE FOLDER ICON BUTTON -->
+        <button type="button" class="btn-browse-folder" onclick="openDirectImportModal()" title="⚡ Direct URL / ZIP Import (Paste link to download & auto-import)">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+        </button>
+        <button type="button" class="btn-browse-folder" onclick="openProjectBrowserModal()" title="Browse Local Projects & Assets">
+            <img src="images/Brows Folder Icon.svg" alt="Browse" onerror="this.outerHTML='<svg viewBox=\'0 0 24 24\' width=\'16\' height=\'16\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2.2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><path d=\'M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z\'></path></svg>'">
+        </button>
+    </div>
+
+    <!-- 4. CATEGORY PILL ROW (Industry Level) -->
+<div class="cat-pill-row-wrapper">
+    <div class="cat-pill-row" id="catPillRow">
+    <button class="cat-pill active" onclick="filterMktCategory('Home', this)">Home</button>
+    <button id="mktOfferPill" class="cat-pill cat-pill-offer" style="display: none;" onclick="filterMktCategory('Offers', this)">
+        <span class="offer-flame-icon">🔥</span>
+        <span id="mktOfferBtnText">Special Deals</span>
+        <span class="offer-live-badge">DEAL</span>
+    </button>
+    <button class="cat-pill" onclick="filterMktCategory('Owned', this)">Owned</button>
+    <button class="cat-pill" onclick="filterMktCategory('Props', this)">Props</button>
+    <button class="cat-pill" onclick="filterMktCategory('Free', this)">Free</button>
+    <button class="cat-pill" onclick="filterMktCategory('Premium', this)">Premium</button>
+    <button class="cat-pill" onclick="filterMktCategory('Characters', this)">Characters</button>
+    <button class="cat-pill" onclick="filterMktCategory('BGs', this)">BGs</button>
+    <button class="cat-pill" onclick="filterMktCategory('AI Bgs', this)">AI Bgs</button>
+    <button class="cat-pill" onclick="filterMktCategory('Effects', this)">Effects</button>
+</div>
+
+    
+    <div class="filter-container">
+        <button type="button" class="cat-filter-btn" id="priceFilterBtn" onclick="togglePriceFilter()">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+            </svg>
+        </button>
+        
+        <div id="priceFilterMenu" class="price-filter-menu">
+            <div class="drag-header">
+                <span>🪙 Credit Range</span>
+                <b id="liveCreditText">Max: All</b>
+            </div>
+            <div class="drag-track-box">
+                <input type="range" id="priceDragInput" min="0" max="2500" step="50" value="2500" oninput="handleRangeDrag(this.value)">
+            </div>
+            <div class="drag-labels">
+                <span>0</span>
+                <span>1,250</span>
+                <span>2,500+</span>
+            </div>
+            <div class="drag-actions">
+                <button type="button" class="btn-sort-mini" onclick="sortAssets('low')">Low ↑</button>
+                <button type="button" class="btn-sort-mini" onclick="sortAssets('high')">High ↓</button>
+                <button type="button" class="btn-reset-mini" onclick="resetRangeSlider()">Reset</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 🎯 4.1 DEDICATED DRAGGABLE SUB-CATEGORY ROW -->
+<div id="subCatPillWrapper" class="sub-cat-row-wrapper" style="display: none;">
+    <div class="sub-cat-pill-row" id="subCatPillRow"></div>
+</div>
+
+<!-- 🎬 16:9 LIVE HD TOP PREVIEW DOCK (SCROLL-FRIENDLY) -->
+<div id="tyTopImagePreviewDock" class="ty-top-cinema-dock" style="display: none;">
+    <div class="dock-inner-container">
+        <!-- Top Bar: Title, Credits, Wishlist & Close -->
+        <div class="dock-header-row">
+            <div class="dock-title-group">
+                <span id="dockAssetCost" class="dock-cost-badge">🪙 0 CREDITS</span>
+                <h4 id="dockAssetTitle" class="dock-title-text">Asset Title</h4>
+            </div>
+            
+            <!-- ACTIONS: WISHLIST + CLOSE -->
+            <div class="dock-header-actions">
+                <button type="button" id="dockFavBtn" class="btn-dock-fav" onclick="handleDockWishlistToggle(event)" title="Add to Wishlist">
+                    <svg class="dock-heart-svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                </button>
+                <button type="button" class="btn-dock-close" onclick="closeTopPreviewDock()" title="Close Preview">✕</button>
+            </div>
+        </div>
+
+        <!-- 16:9 Widescreen Image Stage -->
+        <div class="dock-stage-169">
+            <div id="dockLoader" class="dock-spinner"></div>
+            <img id="dockPreviewImg" src="" alt="Preview" onload="document.getElementById('dockLoader').style.display='none'">
+        </div>
+    </div>
+</div>
+
+<!-- 5. SCROLLABLE BODY -->
+<div class="mkt-scroll-body" id="mktScrollBody">
+
+<!-- 🌐 PROFESSIONAL OFFLINE ERROR SCREEN -->
+<div id="offlineErrorBox" class="error-screen-wrap" style="display: none;">
+    <div class="error-content">
+        <div class="error-icon-box">
+            <svg viewBox="0 0 24 24" width="50" height="50" fill="none" stroke="#64748b" stroke-width="1.5">
+                <path d="M1 1l22 22M16.72 11.06A10.94 10.94 0 0119 12.55M5 12.55a10.94 10.94 0 015.17-2.39M10.71 5.05A16 16 0 0122.58 9M1.42 9a15.91 15.91 0 014.7-2.88M8.53 16.11a6 16 0 016.95 0M12 20h.01"/>
+            </svg>
+        </div>
+        <h3>No Internet Connection</h3>
+        <p>To browse and import assets, please check your network settings and try again.</p>
+        <button class="btn-retry" onclick="window.location.reload()">
+            <span>⚡</span> RETRY CONNECTION
+        </button>
+    </div>
+</div>
+    
+    <!-- RESTORED SLIDER BANNER -->
+    <div id="mktPromoWrapper" class="promo-slider-container" style="display: none;">
+        <div id="sliderTrack" class="slider-track"></div>
+        <div class="slider-nav-next" onclick="nextSlide()">›</div>
+        <div id="sliderDots" class="promo-dots"></div>
+    </div>
+
+    <!-- Coming Soon Placeholder -->
+    <div id="comingSoonBox" class="coming-soon-wrap" style="display: none;">
+        <div class="cs-icon">☺️</div>
+        <h3>Coming Soon</h3>
+        <p>We are crafting premium assets for this category. Stay tuned!</p>
+    </div>
+
+    <!-- ================= 🎯 RESTRUCTURED SECTIONS (FREE + ALL PRODUCTS) ================= -->
+    <div id="mainCatalogArea">
+        
+        <!-- 1. 🟢 FREE ASSETS (SINGLE ROW AUTO-STRETCH GRID) -->
+        <div id="secFreeWrap">
+            <div class="section-title-bar">
+                <span class="sec-left">🟢 Free Assets</span>
+                <a href="javascript:void(0)" class="see-all-link" onclick="openSeeAll('free')">See All ›</a>
+            </div>
+            <!-- Auto-stretch Single Row -->
+            <div class="free-preview-grid" id="freeGrid"></div>
+        </div>
+
+        <!-- 2. 📦 ALL PRODUCTS (COMPLETE CATALOG GRID) -->
+        <div id="secAllWrap" style="margin-top: 14px;">
+            <div class="section-title-bar">
+                <span class="sec-left">📦 All Products</span>
+                <span id="allCountText" style="font-size: 8.5px; color: #64748b; font-weight: 700;">Complete Catalog</span>
+            </div>
+            <!-- Responsive Auto-Flow Grid -->
+            <div class="assets-grid" id="allProductsGrid"></div>
+	    <div id="mktPaginationWrap" class="mkt-pagination-container"></div>
+</div>
+        </div>
+
+        <!-- 3. FULL VIEW / FILTERED GRID -->
+<div id="filteredGridWrap" style="display: none;">
+    <div class="section-title-bar">
+        <span class="sec-left" id="filterResultTitle">Results</span>
+    </div>
+
+    <!-- ⏰ DEDICATED PRO COUNTDOWN BANNER (OFFER & BACK TO HOME KE THEEK NEECHE) -->
+    <div id="mktOfferCountdownBanner" class="offer-countdown-banner-pro" style="display: none;">
+        <div class="ocb-left">
+            <span class="ocb-flame-icon">🔥</span>
+            <div class="ocb-text-group">
+                <strong class="ocb-heading">LIMITED TIME FLASH DEAL</strong>
+                <span class="ocb-subtext">Prices will restore to regular credits when timer hits zero!</span>
+            </div>
+        </div>
+
+        <!-- ⏳ Digital Countdown Units (Days : Hours : Mins : Secs) -->
+        <div class="ocb-timer-boxes">
+            <div class="ocb-unit-card"><b id="ocbDays">00</b><small>Days</small></div>
+            <span class="ocb-colon">:</span>
+            <div class="ocb-unit-card"><b id="ocbHours">00</b><small>Hours</small></div>
+            <span class="ocb-colon">:</span>
+            <div class="ocb-unit-card"><b id="ocbMins">00</b><small>Mins</small></div>
+            <span class="ocb-colon">:</span>
+            <div class="ocb-unit-card ocb-secs-card"><b id="ocbSecs">00</b><small>Secs</small></div>
+        </div>
+    </div>
+
+    <div class="assets-grid" id="filteredGrid"></div>
+    <div id="mktFilteredPaginationWrap" class="mkt-pagination-container"></div>
+</div>
+    
+    <!-- 📄 CATEGORY PAGINATION CONTAINER (100+ प्रोडक्ट्स होने पर दिखेगा) -->
+    <div id="mktFilteredPaginationWrap" class="mkt-pagination-container"></div>
+</div>
+
+    </div>
+</div>
+
+<!-- ================= SAME 3-TAB FOOTER AS STUDIO TOOLS ================= -->
+    <div class="modern-footer-nav">
+        <!-- 1. STUDIO TOOLS TAB -->
+        <div class="footer-tab-item" id="tabStudioTools" onclick="switchToStudioTools()">
+            <svg class="tab-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                <path d="M3.8 20.2l4.6-4.6"></path>
+            </svg>
+            <span class="tab-title">Studio Toolkits</span>
+        </div>
+
+        <!-- 2. ASSET MARKETPLACE TAB (ACTIVE) -->
+        <div class="footer-tab-item active" id="tabMarketplace">
+            <svg class="tab-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l2-5h14l2 5"></path>
+                <path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z"></path>
+                <path d="M9 21v-7a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v7"></path>
+            </svg>
+            <span class="tab-title">Asset Marketplace</span>
+        </div>
+
+        <!-- VERTICAL DIVIDER -->
+        <div class="footer-nav-divider"></div>
+
+        <!-- 3. ACCOUNT TAB -->
+        <div class="footer-tab-item" id="tabAccount" onclick="toggleAccountPopup()">
+            <svg class="tab-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span class="tab-title">Account</span>
+        </div>
+     </div>
+<!-- BOTTOM COPYRIGHT BAR (AB YEH 100% DIKHEGA) -->
+    <div class="pro-copyright-bar">
+        © 2026 Rocco by Raceducater. All Rights Reserved.
+    </div>
+
+        <!-- ============================================================================
+     ⚙️ ULTRA-PRO 1:1 REFERENCE: ACCOUNT & SETTINGS MODAL
+     ============================================================================ -->
+<div id="accountModalPopup" class="account-popup-card-pro" onclick="event.stopPropagation()">
+    
+    <!-- TOP BAR (HEADER & CLOSE) -->
+    <div class="pro-acc-header">
+    <div class="pro-acc-header-left">
+        <h2>Account & Settings</h2>
+        <p>Manage your profile, preferences and more.</p>
+    </div>
+
+    <!-- 👉 TOP RIGHT: UPDATE BUTTON + CLOSE BUTTON -->
+    <div class="pro-acc-header-actions">
+        <button type="button" id="profileUpdateBtn" class="btn-pro-pill-update status-up-to-date" onclick="handleProfileUpdateBtnClick()" title="Check for Updates">
+            <span class="status-icon">✓</span> <span class="status-text">Up to Date</span>
+        </button>
+        <button type="button" class="pro-acc-close-btn" onclick="closeAccountPopup()" title="Close">✕</button>
+    </div>
+</div>
+
+    <div class="pro-acc-scroll-content">
+
+        <!-- CARD 1: PROFILE & THEMES -->
+        <div class="pro-acc-section-card">
+            <div class="pro-acc-sec-title">
+                <span class="sec-title-icon">👤</span>
+                <span>Profile</span>
+            </div>
+
+            <div class="pro-acc-profile-row">
+                <div class="pro-avatar-ring-wrap" onclick="document.getElementById('dpFileInput').click()" title="Change Profile Picture">
+                    <img id="modalAvatarImg" src="images/My Account Icon.webp" alt="Avatar">
+                    <div class="pro-avatar-cam-badge">📷</div>
+                </div>
+
+                <div class="pro-profile-center-info">
+                    <div class="pro-user-name-line">
+                        <input type="text" id="customerNameInput" class="pro-name-input-field" 
+                               value="Rocco Creator" maxlength="20" placeholder="Enter name..." 
+                               onblur="saveCustomerName()" onkeydown="if(event.key==='Enter') this.blur();">
+                        <span class="pro-name-edit-pen" onclick="document.getElementById('customerNameInput').focus()">✏️</span>
+                    </div>
+                    <span class="pro-member-since-text" id="lblMemberSince">Creator Edition &bull; Master Toolkits</span>
+                    
+                    <button type="button" class="btn-pro-change-dp" onclick="document.getElementById('dpFileInput').click()">
+                        📷 Change DP
+                    </button>
+                    <input type="file" id="dpFileInput" accept="image/*" style="display:none;" onchange="handleDPUpload(event)">
+                </div>
+
+                <div class="pro-profile-credits-slot">
+    <div class="pro-modal-credits-card" onclick="openTopUpStore()" title="Click to Top Up Credits">
+        <div class="m-cred-left">
+            <img src="images/TY Coin Icon.png" class="m-cred-coin-img" alt="TY Coin">
+            <div class="m-cred-text-col">
+                <span class="m-cred-amount" id="modalUserCreditBal">0</span>
+                <span class="m-cred-label">Wallet Credits</span>
+            </div>
+        </div>
+        <button type="button" class="m-cred-plus-btn" title="Add Credits">+</button>
+    </div>
+</div>
+            </div>
+
+            <!-- Theme Dots Row -->
+            <div class="pro-acc-divider"></div>
+            <div class="pro-acc-theme-row">
+                <div class="pro-theme-label">
+                    <span class="theme-palette-icon">🎨</span>
+                    <span>Theme Accent Color</span>
+                </div>
+                <div class="theme-dots-row">
+                    <div class="theme-dot dot-navy active" title="Cyber Navy" onclick="changeTheme('theme-navy', this)"></div>
+                    <div class="theme-dot dot-light" title="Studio White + Blue" onclick="changeTheme('theme-light', this)"></div>
+                    <div class="theme-dot dot-pink" title="Neon Pink" onclick="changeTheme('theme-pink', this)"></div>
+                    <div class="theme-dot dot-purple" title="Obsidian Purple" onclick="changeTheme('theme-purple', this)"></div>
+                    <div class="theme-dot dot-animate" title="Classic Animate" onclick="changeTheme('theme-animate', this)"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD 2: ACCOUNT SECURITY / WALLET -->
+        <div class="pro-acc-section-card" id="mktWalletAuthBox">
+            <div class="pro-acc-sec-title">
+                <span class="sec-title-icon">🛡️</span>
+                <span>Account Sync</span>
+            </div>
+
+            <!-- STATE 1: LOGGED OUT -->
+            <div id="mktLoginForm" class="pro-login-form-wrap">
+                <p class="pro-sec-hint-text">Link your Rocco website account to sync credits and verify purchases.</p>
+                <div class="pro-input-group">
+                    <input type="email" id="tyUserEmail" class="pro-sec-input" placeholder="Website Email Address..." autocomplete="email">
+                </div>
+                <div class="pro-input-group password-field-wrap">
+                    <input type="password" id="tyUserPass" class="pro-sec-input" placeholder="Website Password..." autocomplete="current-password">
+                    <button type="button" class="btn-toggle-pwd" onclick="toggleAccountPassword()" title="Show/Hide Password">
+                        <svg id="eyeIconAccountOpen" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        <svg id="eyeIconAccountClosed" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="display:none;">
+                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                            <line x1="1" y1="1" x2="23" y2="23"></line>
+                        </svg>
+                    </button>
+                </div>
+                <button type="button" id="btnSyncWallet" class="btn-pro-theme-action" onclick="loginToonyugWallet()">
+                    ⚡ SYNC ACCOUNT
+                </button>
+                <div id="tyAuthMsg" class="pro-auth-status-msg"></div>
+            </div>
+
+            <!-- STATE 2: LOGGED IN -->
+            <div id="mktLoggedInStatus" class="pro-loggedin-card-row" style="display: none;">
+                <div class="pro-linked-email-col">
+                    <div class="pro-email-text-wrap">
+                        <small>Linked Email</small>
+                        <b id="lblLinkedEmail">user@gmail.com</b>
+                    </div>
+                </div>
+                <button type="button" class="btn-pro-disconnect" onclick="logoutToonyugWallet()">
+                    <span>⇄</span> Disconnect
+                </button>
+            </div>
+        </div>
+
+        <!-- CARD 3: DOWNLOAD PATH SETTINGS -->
+        <div class="pro-acc-section-card">
+            <div class="pro-acc-sec-title">
+                <span class="sec-title-icon">📁</span>
+                <span>Download Path Settings</span>
+            </div>
+            
+            <div class="pro-dl-path-block">
+                <span class="pro-dl-label">Asset Storage Location</span>
+                <div class="pro-dl-path-bar-wrap">
+                    <div class="pro-dl-path-display-text" id="accountStoragePathDisplay" title="Current Download Folder">
+                        Documents/Rocco_Props
+                    </div>
+                    <button type="button" class="btn-pro-browse-path" onclick="changeStorageFromAccount()">
+                        <span>📁</span> Browse
+                    </button>
+                </div>
+                <small class="pro-dl-footnote">ⓘ Where your downloaded assets (.fla, .zip, .png) will be saved.</small>
+            </div>
+        </div>
+
+        <!-- CARD 4: IMPORT PREFERENCES (STAGE IMPORT & RESIZE) -->
+        <div class="pro-acc-section-card" id="unifiedStageCard">
+            <div class="pro-acc-sec-title">
+                <span class="sec-title-icon">⚙️</span>
+                <span>Import Preferences</span>
+            </div>
+
+            <!-- Toggle Row -->
+            <div class="pro-toggle-action-row">
+                <div class="pro-toggle-left-meta">
+                    <div class="pro-toggle-icon-wrap">⚡</div>
+                    <div class="pro-toggle-text-wrap">
+                        <strong>Same Stage Import</strong>
+                        <small>Import assets directly onto current active canvas.</small>
+                    </div>
+                </div>
+                <label class="pro-toggle-switch">
+                    <input type="checkbox" id="chkImportCurrentStage" onchange="handleImportModeToggle(this.checked)">
+                    <span class="pro-toggle-slider"></span>
+                </label>
+            </div>
+
+            <!-- Scale Controller -->
+            <div id="importSizeControlWrap" class="pro-scale-controller-box is-locked">
+                <div class="pro-scale-head-row">
+                    <div class="pro-scale-head-left">
+                        <span id="sizeLockIcon">🔒</span>
+                        <span>Set Import Scale</span>
+                    </div>
+                    <span class="pro-scale-value-badge" id="lblImportSizeValue">🔒 Locked</span>
+                </div>
+
+                <div class="pro-slider-track-wrap">
+                    <input type="range" id="rngImportSize" min="300" max="7680" step="20" value="1080" oninput="handleImportSizeChange(this.value)">
+                </div>
+
+                <div class="pro-presets-btn-row">
+                    <button type="button" class="btn-pro-preset" onclick="setQuickImportSize(300)">300px</button>
+                    <button type="button" class="btn-pro-preset" onclick="setQuickImportSize(1080)">1080p</button>
+                    <button type="button" class="btn-pro-preset" onclick="setQuickImportSize(2160)">4K</button>
+                    <button type="button" class="btn-pro-preset" onclick="setQuickImportSize(7680)">8K</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD 5: ASSISTANCE & SUPPORT -->
+        <div class="pro-acc-section-card">
+            <div class="pro-acc-sec-title">
+                <span class="sec-title-icon">🎧</span>
+                <span>Assistance</span>
+            </div>
+            <p class="pro-assist-subtext">Need help? We're here for you.</p>
+
+            <div class="pro-support-grid-row">
+                <button type="button" class="btn-pro-assist-tile btn-wa-tile" onclick="openWhatsApp()">
+                    <div class="assist-tile-left">
+                        <img src="images/WhatsApp Icon in Color.svg" class="assist-tile-svg" alt="WA" onerror="this.innerHTML='💬'">
+                        <div class="assist-tile-text">
+                            <strong>WhatsApp Support</strong>
+                            <small>+923464056113</small>
+                        </div>
+                    </div>
+                    <span class="assist-tile-arrow">›</span>
+                </button>
+
+                <button type="button" class="btn-pro-assist-tile btn-mail-tile" onclick="openEmail()">
+                    <div class="assist-tile-left">
+                        <img src="images/Email Circle Icon Color.svg" class="assist-tile-svg" alt="Mail" onerror="this.innerHTML='✉️'">
+                        <div class="assist-tile-text">
+                            <strong>Email Desk</strong>
+                            <small>help@expeazzy.com</small>
+                        </div>
+                    </div>
+                    <span class="assist-tile-arrow">›</span>
+                </button>
+            </div>
+
+            <!-- Top Up Wallet Credits Action Button -->
+            <button type="button" class="btn-pro-key-transfer" onclick="openTopUpStore()">
+                <span style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:14px;">🪙</span>
+                <span>Top Up Wallet Credits</span>
+	     </span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ================= 🎯 FIRST TIME STORAGE PICKER MODAL ================= -->
+<div id="storageSetupModal" class="storage-modal-overlay" style="display: none;">
+    <div class="storage-modal-card">
+        <div class="storage-modal-icon">📁</div>
+        <h3 class="storage-modal-title">Set Asset Storage Location</h3>
+        <p class="storage-modal-desc">
+            Choose where your downloaded Rocco Assets (.fla, .zip) will be stored on your computer.
+        </p>
+
+        <div class="storage-path-box-wrap">
+            <span class="storage-box-label">Current Default Location:</span>
+            <div class="storage-path-preview" id="storagePathDisplay">Documents/Rocco_Props</div>
+        </div>
+
+        <div class="storage-modal-btns">
+            <button type="button" class="btn-storage-later" onclick="handleStorageModalChoice('later')">
+                Later (Use Default)
+            </button>
+            <button type="button" class="btn-storage-change" onclick="handleStorageModalChoice('change')">
+                📂 Change Folder
+            </button>
+        </div>
+    </div>
+</div>
+<!-- ================= 🎯 ULTRA-PRO SYNC ACCOUNT MODAL (LARGE & STUDIO GRADE) ================= -->
+<div id="syncAccountModal" class="storage-modal-overlay" style="display: none;" onclick="closeSyncAccountModal(event)">
+    <div class="sync-modal-card-pro" onclick="event.stopPropagation()">
+        
+        <!-- ✕ Top Right Close Button -->
+        <button type="button" class="btn-sync-close-pro" onclick="closeSyncAccountModal()" title="Close">✕</button>
+
+        <!-- ⚡ Glowing Neon Lightning Badge -->
+        <div class="sync-hero-badge-wrap">
+            <div class="sync-badge-glow"></div>
+            <div class="sync-badge-circle">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Headings -->
+        <h3 class="sync-pro-title">ROCCO STUDIO CLOUD ACCOUNT</h3>
+        <p class="sync-pro-subtitle">
+            Rocco Lifetime Enterprise - Unlimited Dev Mode Access.
+        </p>
+
+        <!-- Inputs Form Container -->
+        <div class="sync-pro-inputs-group">
+            <!-- Email Input with Icon -->
+            <div class="sync-input-row-wrap">
+                <svg class="sync-input-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+                <input type="email" id="syncModalEmail" class="sync-input-field-pro" placeholder="Website Email Address..." autocomplete="email">
+            </div>
+
+            <!-- Password Input with Lock & Eye Toggle -->
+            <div class="sync-input-row-wrap password-wrap-pro">
+                <svg class="sync-input-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                <input type="password" id="syncModalPass" class="sync-input-field-pro" placeholder="Website Password..." autocomplete="current-password">
+                
+                <button type="button" class="btn-toggle-pwd-pro" onclick="toggleSyncModalPassword()" title="Show/Hide Password">
+                    <!-- Eye Open -->
+                    <svg id="eyeIconOpen" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    <!-- Eye Closed -->
+                    <svg id="eyeIconClosed" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                        <line x1="1" y1="1" x2="23" y2="23"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Live Status / Error Message -->
+        <div id="syncModalMsg" class="sync-status-msg-pro"></div>
+
+        <!-- Primary Action Button -->
+        <button type="button" id="btnModalSyncWallet" class="btn-sync-action-pro" onclick="handleModalSyncLogin()">
+            <span class="btn-sync-icon">⚡</span>
+            <span>SYNC ACCOUNT</span>
+            <span class="btn-sync-arrow">→</span>
+        </button>
+
+        <!-- Security Sub-note -->
+        <div class="sync-security-note">
+            <span>🔒 Secure End-to-End Encrypted Cloud Sync</span>
+        </div>
+
+    </div>
+</div>
+
+<!-- ============================================================================
+     📁 BROWSE ANIMATE CC PROJECTS & ASSET BROWSER (100% REPAIRED & BALANCED)
+     ============================================================================ -->
+<div id="projectBrowserModalOverlay" class="ty-browser-modal-overlay" style="display: none;" onclick="closeProjectBrowserModal(event)">
+    <div class="ty-browser-window" onclick="event.stopPropagation()">
+        
+        <!-- 1. TOP HEADER -->
+        <div class="browser-header">
+            <div class="browser-header-left">
+                <div class="browser-folder-badge">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="#00d2ff">
+                        <path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"></path>
+                    </svg>
+                </div>
+                <div class="browser-header-text">
+                    <h2>Browse Animate CC Projects</h2>
+                    <p>Select a folder to view your Animate CC files &amp; assets</p>
+                </div>
+            </div>
+            <button type="button" class="btn-browser-close" onclick="closeProjectBrowserModal()">✕</button>
+        </div>
+
+        <!-- 2. FOLDER PATH BAR (CLEAN SINGLE ROW WITH BACK BUTTON) -->
+        <div class="browser-path-bar">
+            <!-- ⬅ FOLDER SE BAHAR AANE KA BUTTON -->
+            <button type="button" class="btn-browser-back" onclick="navigateUpOneLevel()" title="Go Back to Previous Folder">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                <span>Back</span>
+            </button>
+
+            <div class="path-display-box" onclick="selectCustomBrowseFolder()">
+                <span class="path-folder-icon">📁</span>
+                <span id="browserCurrentPathDisplay" class="path-text">C:\Users\Default\Documents\Animate Projects</span>
+                <span class="path-chevron">▼</span>
+            </div>
+
+            <button type="button" class="btn-change-location" onclick="selectCustomBrowseFolder()">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <span>Change Location</span>
+            </button>
+        </div>
+
+        <!-- 3. MAIN WORKSPACE (SIDEBAR + FILE GRID) -->
+        <div class="browser-workspace">
+            
+            <!-- LEFT SIDEBAR: SYSTEM SHORTCUTS + DRAGGABLE CUSTOM FOLDERS -->
+            <div class="browser-sidebar">
+                <!-- 1. System Fixed Shortcuts (Desktop, PC, Drives) -->
+                <div class="sidebar-item active" onclick="loadBrowserPreset('recent', this)">
+                    <span class="sb-icon">🕒</span> <span>Recent</span>
+                </div>
+                <div class="sidebar-item" onclick="loadBrowserPreset('desktop', this)">
+                    <span class="sb-icon">🖥️</span> <span>Desktop</span>
+                </div>
+                <div class="sidebar-item" onclick="loadBrowserPreset('documents', this)">
+                    <span class="sb-icon">📄</span> <span>Documents</span>
+                </div>
+                <div class="sidebar-item" onclick="loadBrowserPreset('animate_projects', this)">
+                    <span class="sb-badge-an">An</span> <span>Animate Projects</span>
+                </div>
+                <div class="sidebar-item" onclick="loadBrowserPreset('this_pc', this)">
+                    <span class="sb-icon">💻</span> <span>This PC</span>
+                </div>
+                <div class="sidebar-item" onclick="loadBrowserPreset('drive_c', this)">
+                    <span class="sb-icon">💽</span> <span>Local Disk (C:)</span>
+                </div>
+                <div class="sidebar-item" onclick="loadBrowserPreset('drive_d', this)">
+                    <span class="sb-icon">💽</span> <span>Local Disk (D:)</span>
+                </div>
+
+                <div class="sidebar-divider"></div>
+
+                <!-- 2. 🎯 DYNAMIC DRAGGABLE CUSTOM FOLDERS LIST (PERSISTENT) -->
+                <div id="browserCustomFoldersList" class="custom-folders-wrap"></div>
+
+                <!-- 3. + ADD FOLDER BUTTON -->
+                <button type="button" class="btn-add-folder" onclick="addNewCustomFolder()" title="Pin a new folder to quick access">
+                    <span>+ Add Folder</span>
+                </button>
+            </div>
+
+            <!-- RIGHT CONTENT AREA: SEARCH, SORT & FILE GRID -->
+            <div class="browser-content-area">
+                
+                <!-- CONTROLS ROW -->
+                <div class="browser-controls-row">
+                    <div class="browser-search-box">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input type="text" id="browserSearchInput" onkeyup="filterBrowserFiles()" placeholder="Search Animate files..." autocomplete="off">
+                    </div>
+
+                    <div class="browser-sort-box">
+                        <span>Sort by:</span>
+                        <select id="browserSortSelect" onchange="sortBrowserFiles(this.value)">
+                            <option value="name_asc">Name (A - Z)</option>
+                            <option value="name_desc">Name (Z - A)</option>
+                            <option value="date_desc">Date (Newest)</option>
+                            <option value="size_desc">Size (Largest)</option>
+                        </select>
+                    </div>
+
+                    <div class="browser-view-toggles">
+                        <button type="button" class="btn-view-toggle active" id="btnViewGrid" onclick="setBrowserViewMode('grid')" title="Grid View">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                                <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+                                <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+                                <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+                                <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+                            </svg>
+                        </button>
+                        <button type="button" class="btn-view-toggle" id="btnViewList" onclick="setBrowserViewMode('list')" title="List View">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                                <line x1="8" y1="6" x2="21" y2="6"></line>
+                                <line x1="8" y1="12" x2="21" y2="12"></line>
+                                <line x1="8" y1="18" x2="21" y2="18"></line>
+                                <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                                <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                                <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SCROLLABLE FILES GRID -->
+                <div class="browser-files-grid" id="browserFilesContainer">
+                    <div style="grid-column:1/-1; text-align:center; padding:50px 10px; color:#64748b; font-size:10px;">Loading files...</div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 4. BOTTOM ACTION BAR (CLEAN CLOSE BUTTON ONLY) -->
+        <div class="browser-footer">
+            <div class="browser-filetype-filter">
+                <span class="ft-label">File type:</span>
+                <select id="browserFileTypeSelect" onchange="filterBrowserByType(this.value)">
+                    <option value="all_supported">All Supported Files (*.fla, *.psd, images, audio, svg)</option>
+                    <option value="fla">Animate CC Files (*.fla)</option>
+                    <option value="psd">Photoshop Files (*.psd)</option>
+                    <option value="images">Image Assets (*.png, *.jpg, *.svg)</option>
+                    <option value="audio">Audio Files (*.mp3, *.wav)</option>
+                </select>
+            </div>
+
+            <div class="browser-footer-actions">
+                <button type="button" class="btn-browser-cancel" onclick="closeProjectBrowserModal()">✕ Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ============================================================================
+     ⚠️ RED WARNING ALERT MODAL (CLICK-OUTSIDE TO CLOSE ENABLED)
+     ============================================================================ -->
+<div id="tySimpleAlertModal" class="ty-simple-alert-overlay" style="display: none;" onclick="closeSimpleAlertModal(event)">
+    <div class="ty-simple-alert-card" onclick="event.stopPropagation()">
+        <!-- Warning Icon -->
+        <div class="ty-alert-icon">⚠️</div>
+
+        <h3 class="ty-alert-title">Local Asset File Missing</h3>
+        <p class="ty-alert-desc">
+            This asset is registered to your account, but the local file was not found in your storage folder. It may have been moved, renamed, or deleted.
+        </p>
+
+        <!-- Missing File Box -->
+        <div class="ty-missing-list-box" id="tyMissingFilesListBox">
+            <div class="ty-missing-item">📄 Loading...</div>
+        </div>
+
+        <!-- Guidance Steps -->
+        <div class="ty-alert-guide-steps">
+            <div class="ty-guide-line">
+                <span class="guide-num">1</span>
+                <span>Select the folder where you moved this asset, or</span>
+            </div>
+            <div class="ty-guide-line">
+                <span class="guide-num">2</span>
+                <span>Re-download it directly from your website account dashboard.</span>
+            </div>
+        </div>
+
+        <!-- Action Buttons Row -->
+        <div class="ty-alert-actions">
+            <button type="button" id="btnAlertChangeDir" class="btn-alert-change" onclick="handleMissingChangeFolder(event)">
+                📂 Locate / Change Folder
+            </button>
+            <button type="button" id="btnAlertReDownload" class="btn-alert-redownload" onclick="handleMissingForceDownload(event)">
+                📥 Re-Download via Website Dashboard
+            </button>
+            <button type="button" id="btnAlertDismiss" class="btn-alert-dismiss" onclick="closeSimpleAlertModal(event)">
+                Dismiss
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ⚠️ SIMPLE & PROFESSIONAL WARNING MODAL -->
+<div id="tySimpleWarningModal" class="ty-clean-alert-overlay" style="display: none;">
+    <div class="ty-clean-alert-box">
+        <div class="ty-clean-alert-icon">⚠️</div>
+        <h4 class="ty-clean-alert-title">Notice</h4>
+        <p id="tyCleanAlertMsg" class="ty-clean-alert-text">
+            Bulk download is not allowed. Please wait for the current asset to complete.
+        </p>
+        <button type="button" class="btn-clean-alert-ok" onclick="closeSimpleWarning()">OK</button>
+    </div>
+</div>
+
+<!-- ============================================================================
+     💎 ULTRA-PREMIUM GLOSSY LOW CREDITS MODAL (WITH LIVE BALANCE COUNTER)
+     ============================================================================ -->
+<div id="tyLowCreditsModal" class="ty-glossy-modal-overlay" onclick="closeLowCreditsModal(event)">
+    <div class="ty-glossy-card" onclick="event.stopPropagation()">
+        
+        <!-- ✕ Close Button -->
+        <button type="button" class="btn-glossy-close" onclick="closeLowCreditsModal(event)" title="Close">✕</button>
+
+        <!-- Top Coin Art -->
+        <div class="coin-art-container">
+            <div class="coin-radial-glow"></div>
+            <img src="images/topup coin icon.png" class="coin-hero-img" alt="Credits" onerror="this.src='images/coin-icon.png'">
+        </div>
+
+        <!-- Headings -->
+        <h2 class="glossy-title">Low Credits</h2>
+        <h4 class="glossy-subtitle">Your credits are running low.</h4>
+        
+        <!-- 🎯 DYNAMIC CREDITS BREAKDOWN PILL (SCREENSHOT MATCH) -->
+        <div class="credits-status-pill">
+            <div class="status-pill-item">
+                <small>You Have</small>
+                <b id="creditValHave">0</b>
+            </div>
+            <div class="status-pill-divider"></div>
+            <div class="status-pill-item">
+                <small>Asset Cost</small>
+                <b id="creditValCost">0</b>
+            </div>
+            <div class="status-pill-divider"></div>
+            <div class="status-pill-item item-short">
+                <small>You Need</small>
+                <b id="creditValShort">0</b>
+            </div>
+        </div>
+
+        <p class="glossy-desc">
+            To continue downloading assets without interruption, please top up your credits by clicking below.
+        </p>
+
+        <!-- Feature Highlight Box -->
+        <div class="glossy-feature-card" onclick="handleGlossyTopUpAction()">
+            <div class="feature-icon-badge">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="#007aff">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+            </div>
+            <div class="feature-text-group">
+                <strong>Keep creating without limits</strong>
+                <span>Top up now and enjoy uninterrupted access to all assets.</span>
+            </div>
+            <div class="feature-arrow">›</div>
+        </div>
+
+        <!-- Glossy Gradient Action Button -->
+        <button type="button" class="btn-glossy-topup" onclick="handleGlossyTopUpAction()">
+            <span class="btn-coin-stack-icon">🪙</span>
+            <span>Top Up Credits</span>
+            <span class="btn-arrow-icon">→</span>
+        </button>
+
+        <!-- Maybe Later Link -->
+        <div class="glossy-footer-action">
+            <span onclick="closeLowCreditsModal(event)">Maybe Later</span>
+        </div>
+
+    </div>
+</div>
+
+<!-- ============================================================================
+     🛒 ULTRA-LUXURY WISHLIST MODAL (EXACT 1:1 REFERENCE IMAGE MATCH)
+     ============================================================================ -->
+<div id="tyWishlistModal" class="wishlist-modal-overlay" style="display: none;" onclick="closeWishlistModal(event)">
+    <div class="wishlist-modal-card-pro" onclick="event.stopPropagation()">
+        
+        <!-- Top-Right Close Button (Circle with ✕) -->
+        <button type="button" class="btn-wl-close-circle" onclick="closeWishlistModal(event)" title="Close">✕</button>
+
+        <!-- 1. HEADER SECTION (With Ambient Golden Glow & Slogan) -->
+        <div class="wl-pro-header">
+            <div class="wl-pro-header-left">
+                <!-- Golden Glowing Cart Icon with Heart -->
+                <div class="wl-cart-icon-wrap">
+                    <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="#fbbf24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="9" cy="21" r="1"></circle>
+                        <circle cx="20" cy="21" r="1"></circle>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                    </svg>
+                    <span class="wl-cart-heart-badge">♥</span>
+                </div>
+                <div class="wl-title-col">
+                    <h2>My <span>Wishlist</span></h2>
+                    <p>Your favorite assets, saved for later</p>
+                </div>
+            </div>
+            
+            <!-- Handwritten Tagline (Right Side) -->
+            <div class="wl-slogan-wrap">
+                <span class="wl-slogan-line">Save Today</span>
+                <span class="wl-slogan-line sub">Create Tomorrow ♡</span>
+            </div>
+        </div>
+
+        <!-- 2. TABLE HEADERS (# | Product | Action | Credits | Remove) -->
+        <div class="wl-table-head">
+            <div class="wl-th col-num">#</div>
+            <div class="wl-th col-prod">Product</div>
+            <div class="wl-th col-cred">Credits</div>
+            <div class="wl-th col-act-btn">Action</div>
+            <div class="wl-th col-act">Remove</div>
+        </div>
+
+        <!-- 3. SCROLLABLE ROWS CONTAINER -->
+        <div class="wl-rows-scroll-area" id="wishlistItemsContainer">
+            <!-- Dynamic Rows will render here -->
+        </div>
+
+        <!-- 4. BOTTOM ACTION & TOTALS BAR -->
+        <div class="wl-pro-footer">
+            <!-- Left: Clear Wishlist Button -->
+            <button type="button" class="btn-wl-clear-pro" id="btnWlClear" onclick="clearFullWishlist()">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+                <span>Clear Wishlist</span>
+            </button>
+
+            <!-- Right: Total Credits Box & "Download All" Action Button -->
+            <div class="wl-footer-right-group">
+                <div class="wl-total-credits-pill">
+                    <div class="wl-total-info">
+                        <span class="wl-tot-title">Total Credits</span>
+                        <span class="wl-tot-count" id="wishlistItemsCountText">0 items in your wishlist</span>
+                    </div>
+                    <div class="wl-tot-amount-wrap">
+                        <img src="images/Wishlist popup coin icon.png" class="wl-coin-img-lg" alt="" onerror="this.src='images/coin-icon.png'">
+                        <b id="wishlistTotalValue">0</b>
+                    </div>
+                </div>
+
+                <!-- 🎯 SECURE BATCH DOWNLOAD BUTTON -->
+                <button type="button" class="btn-wl-add-cart-pro" id="btnWlDownloadAll" onclick="handleDownloadAllWishlist()">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    <span id="lblWlDlAllText">Download All</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 5. SUBTLE BRANDING COPYRIGHT -->
+        <div class="wl-brand-sub">
+            Rocco by Raceducater &bull; Create &bull; Explore &bull; Grow
+        </div>
+
+    </div>
+</div>
+
+<!-- ================= 🔍 16:9 CINEMATIC HD ASSET LIGHTBOX ================= -->
+<div id="tyImagePreviewModal" class="ty-preview-modal-overlay" style="display: none;" onclick="closeImagePreviewModal(event)">
+    <div class="ty-preview-modal-card" onclick="event.stopPropagation()">
+        <!-- Close Button -->
+        <button type="button" class="btn-preview-close" onclick="closeImagePreviewModal(event)" title="Close (Esc)">✕</button>
+
+        <!-- Top Header Bar -->
+        <div class="preview-header-bar">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="preview-tag">HD ASSET PREVIEW</span>
+                <span id="previewModalCost" class="preview-cost-pill">🪙 0 CREDITS</span>
+            </div>
+            <h3 id="previewModalTitle" class="preview-title">Asset Name</h3>
+        </div>
+
+        <!-- 16:9 Cinematic Image Canvas -->
+        <div class="preview-img-container-169">
+            <div id="previewLoader" class="preview-loader-spinner"></div>
+            <img id="previewModalImg" src="" alt="Preview" onload="document.getElementById('previewLoader').style.display='none'">
+        </div>
+
+        <!-- Footer Hint -->
+        <div class="preview-footer-bar">
+            <span>💡 Click anywhere outside or press <kbd>ESC</kbd> to close</span>
+        </div>
+    </div>
+</div>
+
+
+<script>
+(function() {
+    function syncAccountEmailUI() {
+        var email = localStorage.getItem('rocco_user_email') || localStorage.getItem('ty_user_email') || '';
+        var lbl = document.getElementById('lblLinkedEmail');
+        if (lbl) {
+            lbl.innerText = (email && email !== 'developer@raceducater.com') ? email : (email || 'No Account Linked');
+        }
+    }
+    window.addEventListener('DOMContentLoaded', syncAccountEmailUI);
+    window.addEventListener('load', syncAccountEmailUI);
+    setInterval(syncAccountEmailUI, 2000);
+})();
+</script>
+</body>
+</html>

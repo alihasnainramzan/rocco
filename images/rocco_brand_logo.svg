@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 120" width="540" height="120">
+  <defs>
+    <linearGradient id="roccoTextGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="40%" stop-color="#f0f9ff"/>
+      <stop offset="70%" stop-color="#7dd3fc"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+    <linearGradient id="glowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="50%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#00f0ff"/>
+    </linearGradient>
+    <filter id="neonGlow" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Modern Studio Emblem Box -->
+  <g transform="translate(14, 18)">
+    <rect x="0" y="0" width="84" height="84" rx="22" fill="#091224" stroke="url(#glowGrad)" stroke-width="2.5"/>
+    <!-- Sleek Studio 'R' Geometry -->
+    <path d="M 26 19 L 48 19 C 61 19 67 26 67 36 C 67 44 61 50 51 52 L 67 67 L 55 67 L 41 53 L 37 53 L 37 67 L 26 67 Z M 37 29 L 37 44 L 47 44 C 53 44 56 42 56 36 C 56 31 53 29 47 29 Z" fill="url(#roccoTextGrad)"/>
+    <circle cx="68" cy="18" r="4.5" fill="#00f0ff"/>
+  </g>
+  
+  <!-- Bold Text: ROCCO -->
+  <text x="116" y="74" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Montserrat, sans-serif" font-weight="900" font-size="62" letter-spacing="4" fill="url(#roccoTextGrad)">ROCCO</text>
+  
+  <!-- Subtitle Text: by Raceducater -->
+  <text x="120" y="100" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-weight="700" font-size="16" letter-spacing="6" fill="#38bdf8">BY RACEDUCATER</text>
+</svg>

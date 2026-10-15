@@ -1,0 +1,68 @@
+<!-- ============================================================================
+     🗣️ ROCCO ENTERPRISE AUTO LIP-SYNC CONTROLLER MODAL
+     ============================================================================ -->
+<div id="tyLipSyncModal" class="ty-modal-overlay" style="display: none;">
+    <div class="ty-trial-auth-card" style="max-width: 420px; text-align: left; padding: 20px;">
+        
+        <!-- Header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 20px;">🗣️</span>
+                <strong style="font-size: 14px; color: var(--border-accent, #00d2ff);">Auto AI Lip-Sync Engine</strong>
+            </div>
+            <button type="button" class="btn-trial-close" onclick="closeLipSyncModal()">✕</button>
+        </div>
+
+        <p style="font-size: 9px; color: var(--text-muted, #94a3b8); margin-bottom: 14px; line-height: 1.4;">
+            Select your character mouth symbol on the stage, choose the dialogue audio, and let the AI generate exact keyframe lip-sync.
+        </p>
+
+        <!-- 1. Audio File Picker -->
+        <div class="ty-auth-field" style="margin-bottom: 10px;">
+            <label class="ty-auth-label">AUDIO FILE (.WAV / .MP3)</label>
+            <div style="display: flex; gap: 6px;">
+                <div class="ty-auth-input-box" style="flex: 1; height: 32px;">
+                    <input type="text" id="txtLipSyncAudioPath" placeholder="Select dialogue audio..." readonly>
+                </div>
+                <button type="button" class="btn-storage-change" style="padding: 0 12px; height: 32px; font-size: 9px;" onclick="browseLipSyncAudio()">
+                    📁 Browse
+                </button>
+            </div>
+        </div>
+
+        <!-- 2. OpenAI Whisper API Key (Optional for ultra-accuracy) -->
+        <div class="ty-auth-field" style="margin-bottom: 10px;">
+            <label class="ty-auth-label">OPENAI WHISPER API KEY (OPTIONAL FOR 100% PHONEME ACCURACY)</label>
+            <div class="ty-auth-input-box" style="height: 32px;">
+                <input type="password" id="txtWhisperApiKey" placeholder="sk-proj-..." autocomplete="off">
+            </div>
+        </div>
+
+        <!-- 3. Start Frame Offset -->
+        <div class="ty-auth-field" style="margin-bottom: 14px;">
+            <label class="ty-auth-label">TIMELINE START FRAME OFFSET</label>
+            <div class="ty-auth-input-box" style="height: 32px;">
+                <input type="number" id="numLipSyncStartFrame" value="1" min="1" style="font-family: monospace;">
+            </div>
+        </div>
+
+        <!-- 4. Progress Container -->
+        <div id="lipSyncProgressWrap" style="display: none; margin-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between; font-size: 8.5px; margin-bottom: 4px; color: var(--text-title, #fff);">
+                <span id="lblLipSyncStatus">Processing...</span>
+                <span id="lblLipSyncPercent">0%</span>
+            </div>
+            <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
+                <div id="barLipSyncProgress" style="width: 0%; height: 100%; background: linear-gradient(90deg, #00d2ff, #10b981); transition: width 0.2s ease;"></div>
+            </div>
+        </div>
+
+        <!-- Feedback Message -->
+        <div id="lipSyncFeedback" style="display: none; font-size: 9px; font-weight: 700; text-align: center; margin-bottom: 10px;"></div>
+
+        <!-- 5. Action Button -->
+        <button type="button" id="btnExecuteLipSync" class="btn-trial-activate-pro" style="width: 100%; padding: 10px 0;" onclick="startLipSyncProcess()">
+            ⚡ Generate Lip-Sync Keyframes
+        </button>
+    </div>
+</div>
